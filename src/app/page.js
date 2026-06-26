@@ -1,65 +1,286 @@
-import Image from "next/image";
+import courses from "../data/courses.json";
+import ContactForm from "./components/ContactForm";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      {/* HEADER & NAVIGATION */}
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="apex-logo-container gap-3">
+            {/* Left Side: Logo Image */}
+            <img src="/logo.png" alt="Apex Tech Logo" className="h-16 w-16 object-contain" />
+
+            {/* Right Side: Brand Typography */}
+            <div className="apex-logo-text">
+              <div className="apex-brand-main">APEX</div>
+              <div className="apex-brand-sub">TECH SOFTWARE INSTITUTE</div>
+            </div>
+          </div>
+          
+          <nav className="flex space-x-6 md:space-x-8 font-medium">
+            <a href="#home" className="text-blue-600 hover:text-blue-700">Home</a>
+            <a href="#courses" className="text-gray-600 hover:text-blue-600 transition">Courses</a>
+            <a href="#about" className="text-gray-600 hover:text-blue-600 transition">Why Us</a>
+            <a href="#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
+            <a href="/admin" className="text-gray-500 hover:text-indigo-600 transition text-sm flex items-center gap-1.5 font-semibold bg-gray-100 px-3 py-1 rounded-full">
+              <i className="fa-solid fa-user-shield text-xs"></i> Admin
+            </a>
+          </nav>
+          
+          <div className="hidden lg:flex items-center space-x-4">
+            <a href="tel:+918977696937" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition shadow-sm hover:shadow-blue-500/10 flex items-center gap-2">
+              <i className="fa-solid fa-phone"></i>
+              <span>Call Now</span>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO SECTION */}
+      <section id="home" className="bg-gradient-to-r from-slate-900 via-slate-850 to-blue-950 text-white py-24 px-6 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl -ml-20 -mb-20"></div>
+
+        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
+          <div className="md:w-full space-y-6 text-center md:text-left mb-10 md:mb-0">
+            <span className="inline-flex bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
+              Accelerate Your IT Career
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+              Launch Your IT Career with <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Industry-Focused Training</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl">
+              Master the skills that top employers demand. Our industry-aligned curriculum and hands-on approach ensure you're ready for the real world from day one.
+            </p>
+            <div className="pt-4 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+              <a href="#contact" className="bg-blue-500 hover:bg-blue-600 text-white text-center px-8 py-3.5 rounded-xl font-bold transition shadow-lg hover:shadow-blue-500/20">
+                Enquire Today
+              </a>
+              <a href="#courses" className="border border-gray-500 text-center px-8 py-3.5 rounded-xl font-bold hover:bg-white hover:text-slate-900 transition">
+                Explore Courses
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INTRODUCTORY WHY US SECTION */}
+      <section className="py-20 bg-white px-6 border-b border-gray-100">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Empowering Your Tech Journey</h2>
+          <p className="text-xl text-gray-700 leading-relaxed italic mb-8 border-l-4 border-blue-500 pl-4 max-w-3xl mx-auto text-left sm:text-center">
+            &ldquo;At Apex Tech Software Institute, we don&apos;t just teach technology—we build careers.&rdquo;
           </p>
+          <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto text-justify sm:text-center">
+            Our industry-focused training, hands-on projects, expert mentors, real-world case studies, and personalized career guidance help students gain practical skills that employers value. With dedicated placement assistance, interview preparation, resume building, and continuous professional development, we empower learners to confidently transition into successful IT careers and thrive in today&apos;s competitive technology landscape. 
+          </p>
+          <div className="mt-8 font-bold text-blue-600 text-xl">
+            Apex Tech is where ambition meets opportunity and learning transforms into success.
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* FLAGSHIP COURSE HIGHLIGHT (AWS & DEVOPS) */}
+      <section className="py-16 bg-white px-6">
+        <div className="container mx-auto">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50/50 rounded-3xl p-8 md:p-12 border border-blue-100 flex flex-col lg:flex-row items-center justify-between shadow-sm">
+            <div className="lg:w-2/3 space-y-5 mb-6 lg:mb-0">
+              <span className="inline-block bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm shadow-blue-500/10">
+                Trending & Flagship
+              </span>
+              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Advanced AWS & DevOps Program</h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Become a cloud professional. Our comprehensive training program covers everything from core AWS cloud infrastructure to advanced DevOps automation pipelines.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 font-medium text-gray-700">
+                <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>CI/CD Pipelines (Jenkins, GitHub Actions)</div>
+                <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>Infrastructure as Code (Terraform)</div>
+                <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>Containerization (Docker & Kubernetes)</div>
+                <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>AWS Certified Cloud Practitioner & SysOps</div>
+              </div>
+            </div>
+            <div className="lg:w-1/4 text-center lg:text-right w-full sm:w-auto">
+              <a href="/courses/aws-devops" className="inline-block w-full sm:w-auto bg-slate-900 text-white text-center font-bold px-8 py-4 rounded-xl hover:bg-slate-850 transition shadow-md hover:scale-[1.02] active:scale-[0.98]">
+                View Full Curriculum
+              </a>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* ALL MAJOR IT COURSES SECTION */}
+      <section id="courses" className="py-20 bg-gray-50 px-6">
+        <div className="container mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">All Major IT Courses We Offer</h2>
+            <p className="text-gray-600 text-lg">Whether you&apos;re a fresher, a graduate, or switching careers — we have a course built exactly for where you are right now.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course) => (
+              <div key={course.id} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition duration-300 border border-gray-100 flex flex-col justify-between group">
+                <div>
+                  <div className={`w-12 h-12 ${course.bgIcon} rounded-xl flex items-center justify-center text-xl font-bold mb-6 shadow-sm`}>
+                    <i className={course.icon}></i>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-800 tracking-tight group-hover:text-blue-600 transition">
+                    {course.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                    {course.description}
+                  </p>
+                </div>
+                <div className="border-t border-gray-100 pt-5 mt-auto flex items-center justify-between">
+                  <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1">
+                    <i className="fa-solid fa-clock text-blue-400"></i> {course.duration}
+                  </span>
+                  <a href={`/courses/${course.id}`} className="text-blue-600 font-bold text-sm hover:text-blue-700 hover:underline flex items-center gap-1.5 transition">
+                    <span>View Curriculum</span>
+                    <i className="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition duration-300"></i>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY CHOOSE US SECTION */}
+      <section id="about" className="py-24 bg-white px-6">
+        <div className="container mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="lg:w-1/2 space-y-6">
+              <span className="text-blue-600 font-bold uppercase tracking-widest text-xs inline-block bg-blue-50 px-3 py-1 rounded-full">
+                Empowering Your Future
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight">Why Choose Apex Tech Software Institute?</h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                At Apex Tech Software Institute, we don&apos;t just teach technology—we build careers. Our mission is to bridge the gap between academic learning and industry requirements, empowering learners to confidently transition into successful IT careers.
+              </p>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Apex Tech is where ambition meets opportunity and learning transforms into success. We provide the tools, the guidance, and the environment you need to thrive in today&apos;s competitive technology landscape.
+              </p>
+              <div className="pt-4">
+                <a href="#contact" className="inline-flex items-center text-blue-600 font-bold hover:text-blue-700 hover:underline text-lg">
+                  Start Your Journey Today <i className="fa-solid fa-arrow-right ml-2.5"></i>
+                </a>
+              </div>
+            </div>
+
+            <div className="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Feature 1 */}
+              <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 hover:shadow-md transition">
+                <div className="w-12 h-12 bg-white text-blue-600 rounded-xl flex items-center justify-center shadow-sm mb-4 text-xl">
+                  <i className="fa-solid fa-user-tie"></i>
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Expert Mentors</h4>
+                <p className="text-sm text-gray-600">Learn from industry veterans who bring real-world experience and professional insights to the classroom.</p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-md transition">
+                <div className="w-12 h-12 bg-white text-teal-600 rounded-xl flex items-center justify-center shadow-sm mb-4 text-xl">
+                  <i className="fa-solid fa-laptop-code"></i>
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Hands-on Projects</h4>
+                <p className="text-sm text-gray-600">Gain practical skills through intensive, project-based training that simulates real industry challenges.</p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-md transition">
+                <div className="w-12 h-12 bg-white text-orange-600 rounded-xl flex items-center justify-center shadow-sm mb-4 text-xl">
+                  <i className="fa-solid fa-briefcase"></i>
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Placement Support</h4>
+                <p className="text-sm text-gray-600">Dedicated assistance with interview prep, resume building, and connections to top tech employers.</p>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 hover:shadow-md transition">
+                <div className="w-12 h-12 bg-white text-indigo-600 rounded-xl flex items-center justify-center shadow-sm mb-4 text-xl">
+                  <i className="fa-solid fa-chart-line"></i>
+                </div>
+                <h4 className="font-bold text-slate-900 mb-2">Real-world Case Studies</h4>
+                <p className="text-sm text-gray-600">Analyze and solve complex scenarios that professionals face daily in the technology sector.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT & FOOTER SECTION */}
+      <section id="contact" className="py-20 bg-slate-900 text-white px-6">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 border-b border-gray-800 pb-16">
+            <div className="space-y-6">
+              <span className="inline-block bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
+                Get in touch
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Connect With Us</h2>
+              <p className="text-gray-400 text-lg leading-relaxed max-w-md">
+                Let&apos;s Launch Your Tech Career <br/><br/>
+                One conversation. Endless possibilities.<br/>
+                Reach out — we respond immediately.
+              </p>
+              
+              <div className="space-y-6 pt-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-lg shadow-sm border border-blue-500/10">
+                    <i className="fa-solid fa-phone"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Call or WhatsApp</p>
+                    <a href="tel:+918977696937" className="text-xl font-bold hover:text-blue-400 transition">+91 8977696937</a>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-lg shadow-sm border border-blue-500/10">
+                    <i className="fa-solid fa-envelope"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Email Address</p>
+                    <a href="mailto:saicharanmamidi4@gmail.com" className="text-xl font-bold hover:text-blue-400 transition">saicharanmamidi4@gmail.com</a>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-lg shadow-sm border border-blue-500/10">
+                    <i className="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Location</p>
+                    <p className="text-lg font-bold text-gray-200">Kondapur, Hyderabad, Telangana</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-850 rounded-2xl border border-slate-800/80 space-y-4 max-w-md">
+                <h4 className="font-bold text-white text-lg">Our Training Highlights</h4>
+                <ul className="space-y-2.5 text-sm text-gray-300">
+                  <li className="flex items-start"><i className="fa-solid fa-circle-check text-blue-400 mt-1 mr-3 text-xs"></i> 100% Practical & Lab-Based Learning</li>
+                  <li className="flex items-start"><i className="fa-solid fa-circle-check text-blue-400 mt-1 mr-3 text-xs"></i> Real-time Projects & Case Studies</li>
+                  <li className="flex items-start"><i className="fa-solid fa-circle-check text-blue-400 mt-1 mr-3 text-xs"></i> Mock Interviews & Resume Preparation</li>
+                  <li className="flex items-start"><i className="fa-solid fa-circle-check text-blue-400 mt-1 mr-3 text-xs"></i> Flexible Weekday and Weekend Batches</li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              {/* Dynamic Contact Form Component */}
+              <ContactForm courses={courses} />
+            </div>
+          </div>
+
+          <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4 text-center md:text-left">
+            <p>&copy; {new Date().getFullYear()} apextechsoftwareinstitute.com. All rights reserved.</p>
+            <p className="max-w-md">Your tech journey starts here — Apex Tech Software Institute, Kondapur, Hyderabad. Join a batch today. Your future self will thank you.</p>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

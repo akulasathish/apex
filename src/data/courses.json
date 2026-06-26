@@ -1,0 +1,326 @@
+[
+  {
+    "id": "aws-devops",
+    "title": "AWS & DevOps",
+    "icon": "fa-brands fa-aws",
+    "bgIcon": "bg-orange-100 text-orange-600",
+    "badge": "Trending & Flagship",
+    "description": "Become a cloud professional. Our comprehensive training program covers everything from core AWS cloud infrastructure to advanced DevOps automation pipelines.",
+    "duration": "12 Weeks",
+    "level": "Beginner to Advanced",
+    "highlights": [
+      "CI/CD Pipelines (Jenkins, GitHub Actions)",
+      "Infrastructure as Code (Terraform)",
+      "Containerization (Docker & Kubernetes)",
+      "AWS Certified Cloud Practitioner & SysOps"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Cloud Computing & AWS Basics",
+        "topics": [
+          "Introduction to Cloud Computing & AWS Global Infrastructure",
+          "Amazon Elastic Compute Cloud (EC2) - Launching & managing Linux/Windows instances",
+          "Elastic Block Storage (EBS) - Creation, attachment, snapshots, and lifecycle management",
+          "Identity and Access Management (IAM) - Users, Groups, Policies, Roles, and MFA authentication"
+        ]
+      },
+      {
+        "module": "Module 2: Advanced AWS Infrastructure",
+        "topics": [
+          "Virtual Private Cloud (VPC) - Subnets, Route Tables, Internet Gateways, NAT Gateways, and Security Groups",
+          "Amazon Simple Storage Service (S3) - Buckets, versioning, storage classes, policies, and lifecycle rules",
+          "Amazon Relational Database Service (RDS) - Setup, multi-AZ replication, read-replicas, and backups",
+          "Elastic Load Balancing (ELB) & Auto Scaling - High availability and horizontal scaling architectures"
+        ]
+      },
+      {
+        "module": "Module 3: DevOps Core & Automation",
+        "topics": [
+          "AWS CLI - Programmatic control of cloud resources",
+          "CloudWatch - Monitoring system metrics, logging, custom dashboards, and alerting integrations",
+          "Route-53 - Domain registration, DNS records, routing policies, and health checks",
+          "CloudFormation & Introduction to Terraform - Declarative Infrastructure as Code (IaC)"
+        ]
+      },
+      {
+        "module": "Module 4: Continuous Integration & Containerization",
+        "topics": [
+          "CI/CD Pipelines - Jenkins server setup, pipeline-as-code, and GitHub Actions integration",
+          "Docker Containerization - Images, Dockerfiles, volumes, networks, and container orchestration basics",
+          "Kubernetes (EKS) - Clusters, Pods, Services, Deployments, and container management",
+          "Real-World Graduation Project - Deploying a multi-tier microservice architecture in high-availability VPC"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "full-stack-web-dev",
+    "title": "Full Stack Web Development",
+    "icon": "fa-solid fa-laptop-code",
+    "bgIcon": "bg-blue-100 text-blue-600",
+    "badge": "High Demand",
+    "description": "Build powerful web applications. Includes Frontend (HTML, CSS, JavaScript, React) and Backend architectures (Node.js/Python, Databases).",
+    "duration": "16 Weeks",
+    "level": "Beginner to Professional",
+    "highlights": [
+      "Modern Frontend (React.js, Next.js)",
+      "Backend Architecture (Node.js, Express)",
+      "Database Systems (MongoDB, PostgreSQL)",
+      "Deployment & Git (Vercel, Render, AWS)"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Frontend Foundations (HTML, CSS & JS)",
+        "topics": [
+          "Semantic HTML5 & Responsive CSS3 (Flexbox, Grid, Media Queries)",
+          "CSS Frameworks - Tailwind CSS configuration and rapid UI design layout",
+          "JavaScript Essentials - Variables, DOM manipulation, ES6+ features, and async programming",
+          "Asynchronous JS - Fetch API, AJAX, Promises, and integrating public REST APIs"
+        ]
+      },
+      {
+        "module": "Module 2: Advanced Frontend with React",
+        "topics": [
+          "React.js Concepts - Components, Props, State, and Virtual DOM structure",
+          "React Hooks - useState, useEffect, useContext, and custom hook development",
+          "State Management & Routing - React Router v6, Context API, and Redux Toolkit introduction",
+          "Next.js Basics - File-based routing, Server-Side Rendering (SSR), and Static Site Generation (SSG)"
+        ]
+      },
+      {
+        "module": "Module 3: Backend Development (Node.js & Express)",
+        "topics": [
+          "Node.js Runtime - Event loop, package management (NPM), and built-in modules",
+          "Express.js Framework - Route handling, middlewares, request/response models, and error handling",
+          "RESTful API Development - Creating robust endpoints and request validations",
+          "Authentication & Security - JWT token authentication, bcrypt password hashing, and CORS"
+        ]
+      },
+      {
+        "module": "Module 4: Database Systems & Deployment",
+        "topics": [
+          "NoSQL Databases - MongoDB schemas, Mongoose ODM, CRUD operations, and aggregations",
+          "Relational Databases - PostgreSQL basics, tables, joins, and SQL query optimization",
+          "Git & GitHub - Version control workflow, branch management, pull requests, and code reviews",
+          "Deployment - Hosting frontend on Vercel, server on Render/Heroku, and database on MongoDB Atlas"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data-science-ai",
+    "title": "Data Science & AI",
+    "icon": "fa-solid fa-chart-pie",
+    "bgIcon": "bg-purple-100 text-purple-600",
+    "badge": "Future Proof",
+    "description": "Dive deep into data analysis, statistical modeling, Machine Learning algorithms, and artificial intelligence integration.",
+    "duration": "14 Weeks",
+    "level": "Intermediate to Specialist",
+    "highlights": [
+      "Python Libraries (NumPy, Pandas, Matplotlib)",
+      "Supervised & Unsupervised Machine Learning",
+      "Natural Language Processing (NLP) & GenAI",
+      "Interactive Dashboards (Tableau, PowerBI)"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Data Analytics & Mathematical Foundations",
+        "topics": [
+          "Python for Data Science - Advanced data structures, list comprehensions, and lambdas",
+          "Scientific Libraries - Numerical computation with NumPy & data manipulation with Pandas",
+          "Exploratory Data Analysis (EDA) - Statistical visualizations using Matplotlib & Seaborn",
+          "Mathematics & Statistics - Probability distributions, linear algebra, hypothesis testing, and regression analysis"
+        ]
+      },
+      {
+        "module": "Module 2: Core Machine Learning",
+        "topics": [
+          "Supervised Learning - Linear/Logistic Regression, Decision Trees, Random Forests, and SVMs",
+          "Unsupervised Learning - K-Means Clustering, Hierarchical Clustering, and Principal Component Analysis (PCA)",
+          "Model Evaluation & Tuning - Hyperparameter tuning (GridSearchCV), Cross-Validation, and Confusion Matrix metrics",
+          "Feature Engineering - Encoding, scaling, handling missing values, and dimensional reduction"
+        ]
+      },
+      {
+        "module": "Module 3: Neural Networks & Deep Learning",
+        "topics": [
+          "Deep Learning Basics - Artificial Neural Networks (ANN), activation functions, and backpropagation",
+          "Computer Vision - Convolutional Neural Networks (CNN) for image recognition and processing",
+          "Natural Language Processing (NLP) - Text preprocessing, Tokenization, TF-IDF, and Recurrent Neural Networks (RNN)",
+          "Frameworks - Creating and training models using TensorFlow/Keras and PyTorch"
+        ]
+      },
+      {
+        "module": "Module 4: Generative AI & BI Visualization",
+        "topics": [
+          "Generative AI & LLMs - Integration of OpenAI API, prompt engineering, and LangChain embeddings",
+          "Business Intelligence - Creating interactive, publication-quality dashboards in Tableau and PowerBI",
+          "Model Deployment - Building and deploying an ML app using Streamlit on Heroku/AWS Cloud",
+          "Capstone Project - Building an end-to-end predictive analysis or GenAI model on real-world Kaggle datasets"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "python-programming",
+    "title": "Python Programming",
+    "icon": "fa-brands fa-python",
+    "bgIcon": "bg-yellow-100 text-yellow-600",
+    "badge": "Beginner Friendly",
+    "description": "Perfect for absolute beginners. Learn foundational coding, object-oriented principles, scripting, and automation.",
+    "duration": "8 Weeks",
+    "level": "Absolute Beginner to Intermediate",
+    "highlights": [
+      "Foundational Syntax & Data Structures",
+      "Object-Oriented Programming (OOP) in Python",
+      "Database Connectivity (SQLite/MySQL)",
+      "Web Scraping & Script Automation"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Introduction & Python Core Syntax",
+        "topics": [
+          "Introduction to Programming - Setting up Python environment, IDLE, VS Code, and script execution",
+          "Variables & Operators - Numeric, string, boolean data types, and arithmetic/logical operators",
+          "Control Structures - Conditional statements (if-elif-else) and Loops (for, while, nested loops)",
+          "Built-in Data Structures - Mastery of Lists, Tuples, Sets, and Dictionaries"
+        ]
+      },
+      {
+        "module": "Module 2: Functions, Modules & OOP",
+        "topics": [
+          "User-defined Functions - Parameters, arguments (*args, **kwargs), return statements, and local/global scope",
+          "File Handling - Reading, writing, and parsing text files, CSV files, and JSON file streams",
+          "Error & Exception Handling - Try-except-finally blocks, custom exceptions, and debugging code",
+          "Object-Oriented Programming (OOP) - Classes, Objects, Constructor (__init__), Inheritance, Polymorphism, and Encapsulation"
+        ]
+      },
+      {
+        "module": "Module 3: Database & Web Scraping",
+        "topics": [
+          "Database Integration - Database concepts, Python DB-API, and connecting with SQLite/MySQL",
+          "CRUD Operations with DB - Writing SQL queries, fetching records, committing transactions via Python scripts",
+          "Web Scraping - Extracting data from websites using Beautiful Soup 4 and Requests libraries",
+          "Regular Expressions (RegEx) - Pattern matching, text filtering, and parsing structured strings"
+        ]
+      },
+      {
+        "module": "Module 4: Scripting, Automation & Libraries",
+        "topics": [
+          "Desktop GUI Development - Building graphical interfaces using Tkinter library",
+          "Automation - Automated email alerts, scheduling system tasks, and file backups with os/shutil modules",
+          "Popular Modules Overview - Working with Math, DateTime, Random, and external packages via Pip",
+          "Final Practical Project - Creating a multi-functional command line or GUI tool connected to a backend database"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cyber-security",
+    "title": "Cyber Security & Ethical Hacking",
+    "icon": "fa-solid fa-shield-halved",
+    "bgIcon": "bg-red-100 text-red-600",
+    "badge": "High Demand",
+    "description": "Understand digital defense. Learn network security, vulnerability assessment, penetration testing, and risk management mitigation.",
+    "duration": "12 Weeks",
+    "level": "Beginner to Security Expert",
+    "highlights": [
+      "Networking Security & Protocols",
+      "Vulnerability Assessment & Penetration Testing (VAPT)",
+      "Ethical Hacking Tools (Kali Linux, Wireshark)",
+      "OWASP Top 10 Web Application Attacks"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Computer Networking & Security Fundamentals",
+        "topics": [
+          "Network Essentials - TCP/IP model, OSI layers, DNS, DHCP, IP addressing, and subnetting",
+          "Security Concepts - CIA Triad (Confidentiality, Integrity, Availability), Cryptography basics (Symmetric/Asymmetric)",
+          "Operating Systems Security - Windows/Linux security auditing, system log analysis, and registry permissions",
+          "Kali Linux Environment - Setting up a security lab, command line masteries, and update channels"
+        ]
+      },
+      {
+        "module": "Module 2: Reconnaissance & Network Sniffing",
+        "topics": [
+          "Information Gathering - Passive & active foot-printing, OSINT techniques, Shodan, and DNS harvesting",
+          "Port Scanning & Enumeration - Network scanning with Nmap, identifying services, OS fingerprinting, and firewalls",
+          "Packet Analysis - Capturing and analyzing network traffic using Wireshark, identifying plaintext credentials",
+          "Social Engineering - Phishing simulations, credential harvesting, and security awareness controls"
+        ]
+      },
+      {
+        "module": "Module 3: Web Application Penetration Testing",
+        "topics": [
+          "OWASP Top 10 - Comprehensive understanding of critical web application security risks",
+          "Injection Attacks - SQL Injection, Cross-Site Scripting (XSS), and Command Injection testing",
+          "Broken Auth & Session hijacking - Session token manipulation, brute force, and rate limiting bypasses",
+          "Vulnerability Tools - Automating scans using Burp Suite community edition and OWASP ZAP"
+        ]
+      },
+      {
+        "module": "Module 4: System Hacking & Incident Response",
+        "topics": [
+          "Metasploit Framework - Exploit research, payload generation, and launching local security simulations",
+          "Privilege Escalation - Techniques to escalate user rights on Windows and Linux targets",
+          "Wireless Network Security - WPA2/WPA3 auditing, credential cracking, and rogue access points",
+          "Defense & Incident Response - Firewall setups, IDS/IPS alerts, anti-malware policies, and secure system hardening"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "software-testing",
+    "title": "Software Testing (QA)",
+    "icon": "fa-solid fa-bug-slash",
+    "bgIcon": "bg-green-100 text-green-600",
+    "badge": "Placement Oriented",
+    "description": "Master both Manual and Automation testing frameworks using industry standards like Selenium, Java, and API Testing tools.",
+    "duration": "10 Weeks",
+    "level": "Beginner to Test Automation Lead",
+    "highlights": [
+      "Manual Testing & Agile Methodology",
+      "Automation Testing with Selenium WebDriver & Java",
+      "API Testing (Postman & RestAssured)",
+      "Test Automation Frameworks (TestNG, Cucumber)"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Manual Testing & Quality Assurance Principles",
+        "topics": [
+          "Software Development Life Cycle (SDLC) - Waterfall, V-Model, and Agile Scrum methodologies",
+          "Software Test Life Cycle (STLC) - Test plans, test scenarios, test cases, and test metrics design",
+          "Test Case Design Techniques - Equivalence partitioning, boundary value analysis, and decision tables",
+          "Defect Management - Bug reporting, severity vs. priority, and defect lifecycle tracking in Jira"
+        ]
+      },
+      {
+        "module": "Module 2: Java Foundations for Test Automation",
+        "topics": [
+          "Java Basics - JVM, variables, conditional blocks, loops, and handling user inputs",
+          "OOP in Java - Mastering Classes, Objects, Methods, Encapsulation, Polymorphism, and Collections API",
+          "Exception Handling - Custom try-catch blocks and defensive scripting styles",
+          "Build Tool Integration - Setting up Maven projects, managing POM.xml, and external dependencies"
+        ]
+      },
+      {
+        "module": "Module 3: Automation Testing with Selenium WebDriver",
+        "topics": [
+          "WebDriver Architecture - Connecting test scripts to Chrome, Firefox, and Edge browsers",
+          "Locator Strategies - Absolute/Relative XPaths, CSS Selectors, ID, and Name web element identification",
+          "Interactive Automation - Handling alerts, dropdowns, dynamic tables, frames, and windows",
+          "Waits & Synchronization - Implementing Implicit, Explicit, and Fluent waits in Selenium automation"
+        ]
+      },
+      {
+        "module": "Module 4: Advanced Testing Frameworks & APIs",
+        "topics": [
+          "TestNG Framework - Annotations, assertions, parameterization, parallel executions, and custom reports",
+          "API Testing - Manual API validation with Postman & automation with REST Assured",
+          "Page Object Model (POM) - Creating highly scalable, robust, and maintainable automation frameworks",
+          "Continuous Integration (CI) - Integration of automated test suites into Jenkins pipeline runs"
+        ]
+      }
+    ]
+  }
+]
