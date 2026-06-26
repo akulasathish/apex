@@ -33,7 +33,7 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
     setResponse(null);
 
     try {
-      const res = await fetch("/", {
+      const res = await fetch("/__forms.html", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: encode({
@@ -109,6 +109,7 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
         onSubmit={handleSubmit}
         className="space-y-5"
         name="contact"
+        action="/__forms.html"
         data-netlify="true"
       >
         {/* Hidden inputs required for Netlify detection */}
