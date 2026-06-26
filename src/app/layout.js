@@ -30,7 +30,18 @@ export default function RootLayout({ children }) {
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-800">{children}</body>
+      <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-800">
+        {/* Hidden static form for Netlify Form detection */}
+        <form name="contact" data-netlify="true" hidden>
+          <input type="hidden" name="form-name" value="contact" />
+          <input type="text" name="name" />
+          <input type="email" name="email" />
+          <input type="tel" name="phone" />
+          <input type="text" name="course" />
+          <textarea name="message"></textarea>
+        </form>
+        {children}
+      </body>
     </html>
   );
 }
