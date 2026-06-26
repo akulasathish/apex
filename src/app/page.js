@@ -23,9 +23,6 @@ export default function Home() {
             <a href="#courses" className="text-gray-600 hover:text-blue-600 transition">Courses</a>
             <a href="#about" className="text-gray-600 hover:text-blue-600 transition">Why Us</a>
             <a href="#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
-            <a href="/admin" className="text-gray-500 hover:text-indigo-600 transition text-sm flex items-center gap-1.5 font-semibold bg-gray-100 px-3 py-1 rounded-full">
-              <i className="fa-solid fa-user-shield text-xs"></i> Admin
-            </a>
           </nav>
           
           <div className="hidden lg:flex items-center space-x-4">

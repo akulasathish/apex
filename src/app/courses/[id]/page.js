@@ -62,9 +62,6 @@ Phone: +91 8977696937 | Email: saicharanmamidi4@gmail.com
             <a href="/#courses" className="text-blue-600 hover:text-blue-700 font-semibold">Courses</a>
             <a href="/#about" className="text-gray-600 hover:text-blue-600 transition">Why Us</a>
             <a href="/#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
-            <a href="/admin" className="text-gray-500 hover:text-indigo-600 transition text-sm flex items-center gap-1.5 font-semibold bg-gray-100 px-3 py-1 rounded-full">
-              <i className="fa-solid fa-user-shield text-xs"></i> Admin
-            </a>
           </nav>
           <div className="hidden lg:flex items-center space-x-4">
             <a href="tel:+918977696937" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition shadow-sm hover:shadow-blue-500/10 flex items-center gap-2">

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { submitEnquiry } from "../actions/contact";
 
 export default function ContactForm({ courses = [], defaultCourse = "" }) {
   const [formData, setFormData] = useState({
@@ -21,20 +20,33 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Helper to urlencode parameters for Netlify Forms
+  const encode = (data) => {
+    return Object.keys(data)
+      .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+      .join("&");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResponse(null);
 
-    const submissionData = new FormData();
-    Object.entries(formData).forEach(([key, val]) => {
-      submissionData.append(key, val);
-    });
-
     try {
-      const res = await submitEnquiry(null, submissionData);
-      setResponse(res);
-      if (res.success) {
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({
+          "form-name": "contact",
+          ...formData,
+        }),
+      });
+
+      if (res.ok) {
+        setResponse({
+          success: true,
+          message: "Thank you! Your enquiry has been received. Our team will contact you shortly.",
+        });
         // Reset form on success
         setFormData({
           name: "",
@@ -43,12 +55,17 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
           course: defaultCourse || (courses[0]?.id || ""),
           message: "",
         });
+      } else {
+        setResponse({
+          success: false,
+          error: "Could not submit enquiry. Please try again or call us directly.",
+        });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Netlify form submission error:", err);
       setResponse({
         success: false,
-        error: "An unexpected error occurred. Please try again later.",
+        error: "A network error occurred. Please check your internet connection.",
       });
     } finally {
       setLoading(false);
@@ -87,7 +104,16 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Netlify attribute integration */}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5"
+        name="contact"
+        data-netlify="true"
+      >
+        {/* Hidden inputs required for Netlify detection */}
+        <input type="hidden" name="form-name" value="contact" />
+
         <div>
           <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
             Full Name <span className="text-rose-500">*</span>
