@@ -162,8 +162,8 @@ Phone: +91 8977696937 | Email: saicharanmamidi4@gmail.com
                 
                 {/* On-the-fly Syllabus Text Generator */}
                 <a
-                  href={`data:text/plain;charset=utf-8,${encodeURIComponent(textSyllabus)}`}
-                  download={`${course.id}_curriculum_syllabus.txt`}
+                  href={course.id === "sap-erp" ? "/brochures/sap-course-brochure.pdf" : `data:text/plain;charset=utf-8,${encodeURIComponent(textSyllabus)}`}
+                  download={course.id === "sap-erp" ? "SAP_ERP_Core_Program_ApexTech.pdf" : `${course.id}_curriculum_syllabus.txt`}
                   className="w-full bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <i className="fa-solid fa-download text-lg"></i>

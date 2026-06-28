@@ -322,5 +322,59 @@
         ]
       }
     ]
+  },
+  {
+    "id": "sap-erp",
+    "title": "SAP ERP Core Program",
+    "icon": "fa-solid fa-layer-group",
+    "bgIcon": "bg-slate-100 text-slate-700",
+    "badge": "Highly Demanded",
+    "description": "Master enterprise resource planning. Learn SAP FICO (Finance & Controlling) and SAP MM (Materials Management) configuration, database processes, and real-world workflows.",
+    "duration": "12 Weeks",
+    "level": "Beginner to Professional",
+    "highlights": [
+      "SAP FICO Config & Posting Journals",
+      "SAP MM Procurement (P2P Cycle)",
+      "24/7 Official Live Sandbox Access",
+      "Comprehensive SAP Certification Prep"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: SAP ERP Foundations & Navigation",
+        "topics": [
+          "Introduction to ERP systems & SAP GUI Navigation basics",
+          "Understanding Org Structures: Client, Company Code, Plant, and Storage Locations",
+          "Master Data Concepts: Material Master, Vendor Master, General Ledger Accounts",
+          "Transaction mapping workflows, document concepts, and SAP core T-Codes"
+        ]
+      },
+      {
+        "module": "Module 2: SAP Financial Accounting (FI) Configuration",
+        "topics": [
+          "Financial Global Settings: Fiscal Year Variant, Posting Periods, Chart of Accounts",
+          "General Ledger Configuration: Accounts creation, document posting, and journals",
+          "Accounts Payable (AP) and Accounts Receivable (AR) integration setups",
+          "Integration with Materials Management: Automatic Account Determination (OBYC)"
+        ]
+      },
+      {
+        "module": "Module 3: SAP Materials Management (MM) Flow",
+        "topics": [
+          "Procurement Process setup: Requisitions (PR), Quotations, Purchase Orders (PO)",
+          "Inventory Control: Goods Receipt (GR), Goods Issue, Physical stock transfers",
+          "Logistics Invoice Verification (LIV) and credit memo configurations",
+          "Special procurement cycles: Subcontracting, Consignments, and Pipeline flows"
+        ]
+      },
+      {
+        "module": "Module 4: Live Enterprise Project & Interview Prep",
+        "topics": [
+          "Live Enterprise Simulation: Designing and configuring a company in SAP from scratch",
+          "System integration testing: End-to-end P2P Cycle with automatic ledger mapping",
+          "Resume design boot camp: Structuring experience for SAP Consultant and Analyst positions",
+          "Technical mock interviews, SAP Certification guidelines, and job reference listings"
+        ]
+      }
+    ]
   }
 ]
