@@ -12,13 +12,9 @@ export default async function AdminPage() {
       {/* HEADER */}
       <header className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="apex-logo-container gap-3 cursor-pointer">
-            <a href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="Apex Tech Logo" className="h-16 w-16 object-contain" />
-              <div className="apex-logo-text">
-                <div className="apex-brand-main">APEX</div>
-                <div className="apex-brand-sub">TECH SOFTWARE INSTITUTE</div>
-              </div>
+          <div className="apex-logo-container cursor-pointer">
+            <a href="/" className="flex items-center">
+              <img src="/logo.png" alt="ATSI Logo" className="h-[104px] w-auto object-contain" />
             </a>
           </div>
           
