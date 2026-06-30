@@ -376,5 +376,114 @@
         ]
       }
     ]
+  },
+  {
+    "id": "gcp-ai-engineer",
+    "title": "Google Cloud & GenAI Engineer",
+    "icon": "fa-solid fa-cloud",
+    "bgIcon": "bg-blue-100 text-blue-600",
+    "badge": "GCP AI-First",
+    "description": "Master cloud AI engineering. Learn prompt engineering, Retrieval-Augmented Generation (RAG), agentic workflows, and production deployment using Google Cloud Vertex AI and Gemini APIs.",
+    "duration": "12 Weeks",
+    "level": "Beginner to Professional",
+    "highlights": [
+      "Build with Google Gemini 1.5 Pro",
+      "Vertex AI Studio & Model Builder",
+      "RAG & Agentic Workflows",
+      "Production AI App Deployments"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Cloud & Generative AI Foundations",
+        "topics": [
+          "Introduction to Google Cloud Console, Cloud IAM, and Cloud Storage basics",
+          "Understanding GenAI concepts, Transformer models, and LLM architectures",
+          "The Google Gemini Model Family (Gemini Pro, Flash, Ultra) and API usage",
+          "Prompt engineering techniques, system instructions, and temperature tuning"
+        ]
+      },
+      {
+        "module": "Module 2: Building with Vertex AI",
+        "topics": [
+          "Vertex AI Studio - Interactive testing of chat, text, and multimodal prompts",
+          "Vertex AI Search and Conversation - Rapid creation of enterprise-ready search applications",
+          "Building Retrieval-Augmented Generation (RAG) pipelines for document processing",
+          "Embedding creation using Vertex AI Text Embeddings and custom vector indexing"
+        ]
+      },
+      {
+        "module": "Module 3: Advanced AI Agents & Orchestration",
+        "topics": [
+          "LLM Orchestration frameworks: Connecting Gemini API with LangChain and LlamaIndex",
+          "Building Agentic workflows with tool calling, function calling, and API integration",
+          "AI Agent grounding using Google Search and database connectors",
+          "Session management and chat history storage using Cloud Firestore"
+        ]
+      },
+      {
+        "module": "Module 4: Enterprise AI MLOps & Monitoring",
+        "topics": [
+          "Deploying custom AI APIs and backends on Google Cloud Run (Serverless Containerization)",
+          "Monitoring LLM application performance, safety parameters, and costs on GCP",
+          "A/B testing different prompts and model versions using Cloud Logging and Vertex AI",
+          "Graduation Project: Build and deploy an enterprise-grade AI chatbot on Google Cloud"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mlops-genaiops-gcp",
+    "title": "MLOps & GenAIOps on GCP",
+    "icon": "fa-solid fa-gears",
+    "bgIcon": "bg-teal-100 text-teal-600",
+    "badge": "GCP Cloud Expert",
+    "description": "Learn to automate machine learning pipelines, construct robust data engineering streams, and continuously deploy GenAI applications at scale on Google Cloud.",
+    "duration": "10 Weeks",
+    "level": "Intermediate to Advanced",
+    "highlights": [
+      "Automate Pipelines with Vertex AI",
+      "BigQuery ML & Dataflow Pipelines",
+      "Continuous AI Integration (CI/CD)",
+      "Vertex AI Model Monitoring"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Machine Learning Pipelines with Vertex AI Pipelines",
+        "topics": [
+          "Introduction to Kubeflow Pipelines (KFP) and automated workflow orchestration",
+          "Defining pipeline components for data ingestion, preprocessing, and model training",
+          "Vertex AI Pipeline execution, lineage tracking, and metadata management",
+          "Scheduling automated model re-training jobs on Google Cloud"
+        ]
+      },
+      {
+        "module": "Module 2: BigData Engineering for AI on Google Cloud",
+        "topics": [
+          "Designing scalable data warehouses with Google BigQuery and BigQuery ML",
+          "Real-time event streaming and data integration using Pub/Sub and Apache Beam on Dataflow",
+          "Feature engineering and storing vectors in Vertex AI Feature Store",
+          "Database optimization for RAG pipelines with Cloud SQL (pgvector) and AlloyDB"
+        ]
+      },
+      {
+        "module": "Module 3: Continuous Integration & Deployment for AI (CI/CD)",
+        "topics": [
+          "Automating build pipelines for ML and LLM code using Google Cloud Build",
+          "Deploying scalable, containerized model endpoints using GKE (Google Kubernetes Engine)",
+          "Implementing blue-green and canary model deployments for high-availability production",
+          "Securing machine learning APIs with Google Cloud Endpoints and API Gateway"
+        ]
+      },
+      {
+        "module": "Module 4: Model Monitoring, Safety & Compliance",
+        "topics": [
+          "Tracking feature drift and prediction skew with Vertex AI Model Monitoring",
+          "Implementing safety, content moderation, and toxicity filters on Generative AI outputs",
+          "Logging and auditing system access and AI request parameters with Cloud Audit Logs",
+          "Final Capstone Project: Automated CI/CD pipeline that builds, tests, and deploys a fine-tuned model"
+        ]
+      }
+    ]
   }
 ]
+

@@ -39,7 +39,7 @@ ${course.syllabus
 
 --------------------------------------------------
 Contact ApexTech Software Institute, Kondapur, Hyderabad
-Phone: +91 8977696937 | Email: saicharanmamidi4@gmail.com
+Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
 ==================================================
 `;
 

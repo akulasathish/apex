@@ -332,7 +332,7 @@
                                 </div>
                                 <div>
                                 <p class="text-xs text-gray-400 uppercase">Email Address</p>
-                                <a href="mailto:saicharanmamidi4@gmail.com" class="text-lg font-bold hover:text-blue-400 transition">saicharanmamidi4@gmail.com</a>
+                                <a href="mailto:hr@apextechsoftwareinstitute.com" class="text-lg font-bold hover:text-blue-400 transition">hr@apextechsoftwareinstitute.com</a>
                             </div>
                         </div>
                     </div>

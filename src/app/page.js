@@ -2,8 +2,45 @@ import courses from "../data/courses.json";
 import ContactForm from "./components/ContactForm";
 
 export default function Home() {
+  const aiFeatures = [
+    { text: "Google Cloud AI Ecosystem Focus", icon: "fa-solid fa-rocket", color: "text-red-400" },
+    { text: "Gemini 1.5 Pro & Flash Integration", icon: "fa-solid fa-brain", color: "text-blue-400" },
+    { text: "Vertex AI Studio Prompt Tuning", icon: "fa-solid fa-microchip", color: "text-teal-400" },
+    { text: "Retrieval-Augmented Generation (RAG)", icon: "fa-solid fa-magnifying-glass", color: "text-amber-400" },
+    { text: "Agentic Workflows & Multi-Tool Calling", icon: "fa-solid fa-diagram-project", color: "text-indigo-400" },
+    { text: "Vertex AI Vector Search & Embeddings", icon: "fa-solid fa-database", color: "text-purple-400" },
+    { text: "BigQuery ML Student Success Prediction", icon: "fa-solid fa-chart-line", color: "text-emerald-400" },
+    { text: "MLOps & GenAIOps Pipelines", icon: "fa-solid fa-gears", color: "text-pink-400" },
+    { text: "Enterprise AI Safety & Output Filters", icon: "fa-solid fa-shield-halved", color: "text-sky-400" }
+  ];
+
   return (
     <>
+      {/* GOOGLE CLOUD AI-FIRST MARQUEE TICKER */}
+      <div className="w-full bg-slate-950 text-white border-b border-blue-500/10 py-3 overflow-hidden relative z-50 flex items-center select-none">
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none"></div>
+        
+        <div className="animate-marquee whitespace-nowrap flex items-center gap-12 text-xs font-bold uppercase tracking-wider">
+          {/* First Render */}
+          {aiFeatures.map((item, idx) => (
+            <div key={`ai-f-1-${idx}`} className="flex items-center gap-3.5 mx-2">
+              <i className={`${item.icon} ${item.color} text-sm`}></i>
+              <span className="text-gray-200">{item.text}</span>
+              <span className="text-blue-500/40 text-xs">•</span>
+            </div>
+          ))}
+          {/* Second Render for Infinite Loop */}
+          {aiFeatures.map((item, idx) => (
+            <div key={`ai-f-2-${idx}`} className="flex items-center gap-3.5 mx-2">
+              <i className={`${item.icon} ${item.color} text-sm`}></i>
+              <span className="text-gray-200">{item.text}</span>
+              <span className="text-blue-500/40 text-xs">•</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* HEADER & NAVIGATION */}
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
@@ -40,25 +77,137 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl -ml-20 -mb-20"></div>
 
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
-          <div className="md:w-full space-y-6 text-center md:text-left mb-10 md:mb-0">
+        <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between relative z-10 gap-12 lg:gap-8">
+          {/* Left Side: Text Copy & Call-to-actions */}
+          <div className="lg:w-7/12 space-y-6 text-center lg:text-left mb-10 lg:mb-0">
             <span className="inline-flex bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
-              Accelerate Your IT Career
+              ⚡ GOOGLE CLOUD AI ECOSYSTEM COHORT
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-              Launch Your IT Career with <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Industry-Focused Training</span>
+              Launch Your Cloud & <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">GenAI Career with Hands-On Labs</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl">
-              Master the skills that top employers demand. Our industry-aligned curriculum and hands-on approach ensure you're ready for the real world from day one.
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0">
+              Master Vertex AI, Gemini 1.5, AWS DevOps, and Cyber Security. Gain real-world experience inside live Google Cloud sandboxes and build production-grade enterprise software.
             </p>
-            <div className="pt-4 flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+            <div className="pt-4 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
               <a href="#contact" className="bg-blue-500 hover:bg-blue-600 text-white text-center px-8 py-3.5 rounded-xl font-bold transition shadow-lg hover:shadow-blue-500/20">
                 Enquire Today
               </a>
               <a href="#courses" className="border border-gray-500 text-center px-8 py-3.5 rounded-xl font-bold hover:bg-white hover:text-slate-900 transition">
                 Explore Courses
               </a>
+            </div>
+          </div>
+
+          {/* Right Side: Active Cohorts & GCP Live Sandbox Tracker Dashboard */}
+          <div className="lg:w-5/12 w-full max-w-md mx-auto">
+            <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+              {/* Subtle background card glows */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+              
+              {/* Card Header */}
+              <div className="flex justify-between items-center mb-5 border-b border-slate-800 pb-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs uppercase tracking-widest font-extrabold text-gray-400">Live Academy Tracker</span>
+                </div>
+                <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 rounded-full font-bold">Active Cohorts</span>
+              </div>
+
+              {/* Course Cohorts List (Scrollable to save space and look extremely premium!) */}
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                {/* Cohort 1: GCP & AI */}
+                <div className="p-3 rounded-xl bg-slate-850/60 border border-slate-800/80 hover:border-blue-500/20 transition group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-blue-400 transition">Google Cloud & GenAI</h4>
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Vertex AI • Gemini 1.5 • RAG</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-black text-blue-400">10 Enrolled</span>
+                      <p className="text-[9px] text-emerald-400 mt-0.5 font-medium">Labs Active ●</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cohort 2: AWS & DevOps */}
+                <div className="p-3 rounded-xl bg-slate-850/60 border border-slate-800/80 hover:border-orange-500/20 transition group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-orange-400 transition">Advanced AWS & DevOps</h4>
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Terraform • Docker • CI/CD Pipelines</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-black text-orange-400">15 Enrolled</span>
+                      <p className="text-[9px] text-emerald-400 mt-0.5 font-medium">Labs Active ●</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cohort 3: Cyber Security */}
+                <div className="p-3 rounded-xl bg-slate-850/60 border border-slate-800/80 hover:border-red-500/20 transition group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-red-400 transition">Cyber Security & Ethical Hacking</h4>
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">VAPT • Kali Linux • Wireshark</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-black text-red-400">20 Enrolled</span>
+                      <p className="text-[9px] text-emerald-400 mt-0.5 font-medium">Lab Drills ●</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cohort 4: GCP MLOps (SUGGESTED HIGH IMPACT!) */}
+                <div className="p-3 rounded-xl bg-slate-850/60 border border-slate-800/80 hover:border-teal-500/20 transition group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-teal-400 transition">MLOps & GenAIOps on GCP</h4>
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Vertex Pipelines • BigQuery ML • Cloud Build</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-black text-teal-400">8 Enrolled</span>
+                      <p className="text-[9px] text-emerald-400 mt-0.5 font-medium">Pipelines Active ●</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cohort 5: Data Science & AI (SUGGESTED HIGH IMPACT!) */}
+                <div className="p-3 rounded-xl bg-slate-850/60 border border-slate-800/80 hover:border-purple-500/20 transition group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-xs font-bold text-white group-hover:text-purple-400 transition">Data Science & AI (ML)</h4>
+                      <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Python • Scikit-Learn • TensorFlow</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-black text-purple-400">12 Enrolled</span>
+                      <p className="text-[9px] text-emerald-400 mt-0.5 font-medium">Training ●</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Cloud Sandbox Stats (Strategic Value Addition!) */}
+              <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-center">
+                <div>
+                  <span className="text-lg font-black text-white">45+</span>
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 mt-1">Active GCP Sandboxes</p>
+                </div>
+                <div className="h-8 w-px bg-slate-800"></div>
+                <div>
+                  <span className="text-lg font-black text-white">8.5K+</span>
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 mt-1">Gemini API Requests</p>
+                </div>
+                <div className="h-8 w-px bg-slate-800"></div>
+                <div>
+                  <span className="text-lg font-black text-white">92%</span>
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 mt-1">Lab Success Rate</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -141,6 +290,113 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* APEX AI LABS - PROPRIETARY AI TECHNOLOGY SHOWCASE */}
+      <section className="py-24 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 text-white px-6 relative overflow-hidden">
+        {/* Decorative glows */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">
+              Google Cloud Powered Proprietary AI Labs
+            </span>
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">
+              Apex AI Labs: Educational Technology
+            </h2>
+            <p className="text-gray-400 text-lg">
+              At Apex Tech Software Institute, we don&apos;t just teach cloud and artificial intelligence — we build our own custom AI systems on Google Cloud infrastructure. Explore our proprietary EdTech solutions below.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Project 1: Apex Smart-Tutor */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 hover:border-blue-500/40 transition duration-300 shadow-xl relative group flex flex-col justify-between">
+              <div>
+                <span className="absolute top-4 right-6 text-xs bg-blue-500/20 text-blue-300 font-semibold px-3 py-1 rounded-full border border-blue-500/30">
+                  Adaptive Learning
+                </span>
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-400 rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 border border-blue-500/20">
+                  <i className="fa-solid fa-robot"></i>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 tracking-tight text-white group-hover:text-blue-400 transition">
+                  Apex Smart-Tutor
+                </h3>
+                <p className="text-gray-400 text-base mb-6 leading-relaxed">
+                  Our proprietary, RAG-enabled artificial intelligence mentor integrates directly into the student portal. Leveraging deep reasoning models, it offers students personalized 24/7 assistance, interactive curriculum queries, code reviews, and automatic lecture summaries.
+                </p>
+                <div className="space-y-3.5 mb-8">
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Gemini 1.5 Pro integration:</strong> Complete code reasoning and multi-turn educational coaching.</span>
+                  </div>
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Contextual Grounding:</strong> Vector search over entire textbooks and classroom notes via Vertex AI Vector Search.</span>
+                  </div>
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Serverless Hosting:</strong> Sub-second dynamic scaling and low API latency on Cloud Run.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-800/80 pt-6 mt-auto">
+                <p className="text-xs uppercase tracking-widest font-semibold text-slate-500 mb-3">Google Cloud Stack:</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-blue-950 text-blue-300 px-2.5 py-1.5 rounded-lg border border-blue-900/50 font-medium">Gemini Pro API</span>
+                  <span className="text-xs bg-blue-950 text-blue-300 px-2.5 py-1.5 rounded-lg border border-blue-900/50 font-medium">Vertex AI Vector Search</span>
+                  <span className="text-xs bg-blue-950 text-blue-300 px-2.5 py-1.5 rounded-lg border border-blue-900/50 font-medium">Cloud Run</span>
+                  <span className="text-xs bg-blue-950 text-blue-300 px-2.5 py-1.5 rounded-lg border border-blue-900/50 font-medium">Cloud Storage</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Project 2: Apex AI Placement Matcher */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 hover:border-teal-500/40 transition duration-300 shadow-xl relative group flex flex-col justify-between">
+              <div>
+                <span className="absolute top-4 right-6 text-xs bg-teal-500/20 text-teal-300 font-semibold px-3 py-1 rounded-full border border-teal-500/30">
+                  Career Analytics
+                </span>
+                <div className="w-14 h-14 bg-gradient-to-br from-teal-500/20 to-emerald-500/20 text-teal-400 rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 border border-teal-500/20">
+                  <i className="fa-solid fa-briefcase"></i>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 tracking-tight text-white group-hover:text-teal-400 transition">
+                  AI Talent Matcher & Placement Engine
+                </h3>
+                <p className="text-gray-400 text-base mb-6 leading-relaxed">
+                  Our advanced data recommendation platform bridges the gap between student graduation and immediate professional employment. The system processes student portfolios and matches them in real-time against active corporate tech listings.
+                </p>
+                <div className="space-y-3.5 mb-8">
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Predictive Placement Analytics:</strong> Classification algorithms trained directly in BigQuery ML.</span>
+                  </div>
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Skill Mapping Feature Store:</strong> Low-latency user profile features and skill ratings in Vertex AI.</span>
+                  </div>
+                  <div className="flex items-start text-sm text-gray-300">
+                    <i className="fa-solid fa-circle-check text-emerald-400 mt-1 mr-3"></i>
+                    <span><strong>Interactive BI Reports:</strong> Complete executive visualization of graduate analytics built using Looker Studio.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-800/80 pt-6 mt-auto">
+                <p className="text-xs uppercase tracking-widest font-semibold text-slate-500 mb-3">Google Cloud Stack:</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-teal-950 text-teal-300 px-2.5 py-1.5 rounded-lg border border-teal-900/50 font-medium">BigQuery ML</span>
+                  <span className="text-xs bg-teal-950 text-teal-300 px-2.5 py-1.5 rounded-lg border border-teal-900/50 font-medium">Vertex AI Feature Store</span>
+                  <span className="text-xs bg-teal-950 text-teal-300 px-2.5 py-1.5 rounded-lg border border-teal-900/50 font-medium">Looker Studio</span>
+                  <span className="text-xs bg-teal-950 text-teal-300 px-2.5 py-1.5 rounded-lg border border-teal-900/50 font-medium">Cloud SQL (pgvector)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -240,7 +496,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Email Address</p>
-                    <a href="mailto:saicharanmamidi4@gmail.com" className="text-xl font-bold hover:text-blue-400 transition">saicharanmamidi4@gmail.com</a>
+                    <a href="mailto:hr@apextechsoftwareinstitute.com" className="text-xl font-bold hover:text-blue-400 transition">hr@apextechsoftwareinstitute.com</a>
                   </div>
                 </div>
 
