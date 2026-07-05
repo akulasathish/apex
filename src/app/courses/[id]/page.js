@@ -48,13 +48,9 @@ Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
       {/* HEADER & NAVIGATION */}
       <header className="bg-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <div className="apex-logo-container gap-3 cursor-pointer">
-            <a href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="Apex Tech Logo" className="h-16 w-16 object-contain" />
-              <div className="apex-logo-text">
-                <div className="apex-brand-main">APEX</div>
-                <div className="apex-brand-sub">TECH SOFTWARE INSTITUTE</div>
-              </div>
+          <div className="apex-logo-container">
+            <a href="/" className="flex items-center">
+              <img src="/logo.png" alt="ATSI Logo" className="h-16 w-auto object-contain" />
             </a>
           </div>
           <nav className="flex space-x-6 md:space-x-8 font-medium">
