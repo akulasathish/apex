@@ -10,18 +10,18 @@ class SAPBrochurePDF(FPDF):
     def header(self):
         # Header layout
         if os.path.exists(self.logo_path):
-            # The horizontal logo (1294 x 768) with ~1.68 aspect ratio
+            # The original logo is a premium square-ish image (approx 1.03 aspect ratio)
             # Position it elegantly on the top-left of the header
-            self.image(self.logo_path, 10, 6, 32, 16)
+            self.image(self.logo_path, 12, 5, 16, 16)
         
         self.set_font("helvetica", "B", 15)
         self.set_text_color(15, 23, 42) # Slate-900 (Dark Slate)
-        self.set_xy(45, 7)
+        self.set_xy(32, 7)
         self.cell(0, 6, "APEX TECH SOFTWARE INSTITUTE", ln=True)
         
         self.set_font("helvetica", "", 8)
         self.set_text_color(100, 116, 139) # Slate-500
-        self.set_x(45)
+        self.set_x(32)
         self.cell(0, 4, "Kondapur, Hyderabad, Telangana | +91 8977696937 | www.apextechsoftwareinstitute.com", ln=True)
         
         # Elegant blue accent rule line under header
