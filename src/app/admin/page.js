@@ -14,7 +14,7 @@ export default async function AdminPage() {
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="apex-logo-container">
             <a href="/" className="flex items-center">
-              <img src="/logo.png" alt="ATSI Logo" className="h-16 w-auto object-contain" />
+              <img src="/logo.png" alt="ATSI Logo" className="h-20 w-auto object-contain" />
             </a>
           </div>
           
