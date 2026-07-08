@@ -35,11 +35,14 @@ def main():
     cert_img = Image.open(template_path).convert("RGB")
     w, h = cert_img.size
     
-    # 1. Clean parchment crops to erase the old logo/text at the top (X: 300 to 720, Y: 15 to 155)
-    left_logo_patch = cert_img.crop((50, 15, 262, 155))
-    right_logo_patch = cert_img.crop((762, 15, 974, 155))
-    cert_img.paste(left_logo_patch, (300, 15))
-    cert_img.paste(right_logo_patch, (512, 15))
+    # 1. Clean parchment crops to erase the old logo/text at the top (X: 80 to w-80, Y: 15 to 255)
+    # Crop a clean horizontal strip from the bottom-left area (where there is no text/logo/stamps/signatures on the template)
+    clean_patch = cert_img.crop((100, 545, 300, 615)) # width 200, height 70
+    
+    # Tile horizontally and vertically to erase all old headers
+    for y_dest in [15, 85, 155, 185]:
+        for x_dest in [80, 280, 480, 680, 800]:
+            cert_img.paste(clean_patch, (x_dest, y_dest))
 
     # Paste the new transparent logo centered horizontally at the top
     logo_path = "public/logo.png"
@@ -99,10 +102,19 @@ def main():
     draw.text((70, 625), id_text, font=font_id, fill=(15, 23, 42))
 
     # 5. Erase the old student name completely (X: 200 to 800, Y: 310 to 400)
-    name_bg_patch_left = cert_img.crop((40, 150, 340, 240)) # width 300, height 90
-    name_bg_patch_right = cert_img.crop((680, 150, 980, 240)) # width 300, height 90
-    cert_img.paste(name_bg_patch_left, (200, 310))
-    cert_img.paste(name_bg_patch_right, (500, 310))
+    # Using clean side column patches: X: 70-170, Y: 70-160 for left; X: 854-954, Y: 70-160 for right
+    left_name_patch = cert_img.crop((70, 70, 170, 160))   # size 100 x 90
+    right_name_patch = cert_img.crop((854, 70, 954, 160)) # size 100 x 90
+    
+    # Tile left patch for the left half
+    cert_img.paste(left_name_patch, (200, 310))
+    cert_img.paste(left_name_patch, (300, 310))
+    cert_img.paste(left_name_patch, (400, 310))
+    
+    # Tile right patch for the right half
+    cert_img.paste(right_name_patch, (500, 310))
+    cert_img.paste(right_name_patch, (600, 310))
+    cert_img.paste(right_name_patch, (700, 310))
     
     # Draw the student's name in UPPERCASE to match the template style
     font_path_serif_italic = "/usr/share/fonts/liberation/LiberationSerif-BoldItalic.ttf"
