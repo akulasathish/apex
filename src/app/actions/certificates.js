@@ -148,3 +148,57 @@ export async function revokeCertificate(id, newStatus) {
     return { success: false, error: error.message };
   }
 }
+
+import { cookies } from "next/headers";
+
+export async function loginAdmin(email, password) {
+  try {
+    const adminsRef = db.collection("admins");
+    const snapshot = await adminsRef.get();
+    
+    // Auto-seed if database collection is empty
+    if (snapshot.empty) {
+      await adminsRef.doc("saicharan@apextechsoftware.com").set({
+        email: "saicharan@apextechsoftware.com",
+        password: "8686113435@Akula"
+      });
+    }
+
+    const docId = email.toLowerCase().trim();
+    const doc = await adminsRef.doc(docId).get();
+
+    if (!doc.exists) {
+      return { success: false, error: "Invalid email or password." };
+    }
+
+    const admin = doc.data();
+    if (admin.password !== password) {
+      return { success: false, error: "Invalid email or password." };
+    }
+
+    const cookieStore = await cookies();
+    cookieStore.set("admin_logged_in", "true", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24, // 1 day
+      path: "/"
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function logoutAdmin() {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete("admin_logged_in");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error) {
+    console.error("Error logging out:", error);
+    return { success: false, error: error.message };
+  }
+}

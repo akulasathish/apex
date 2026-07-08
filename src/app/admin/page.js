@@ -1,11 +1,20 @@
 import { getLeads } from "../actions/contact";
-import { getCertificates } from "../actions/certificates";
+import { getCertificates, logoutAdmin } from "../actions/certificates";
 import courses from "../../data/courses.json";
 import AdminDashboard from "./AdminDashboard";
+import AdminLogin from "./AdminLogin";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const cookieStore = await cookies();
+  const isLoggedIn = cookieStore.get("admin_logged_in")?.value === "true";
+
+  if (!isLoggedIn) {
+    return <AdminLogin />;
+  }
+
   const initialLeads = await getLeads();
   const initialCertificates = await getCertificates();
 
@@ -20,10 +29,15 @@ export default async function AdminPage() {
             </a>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <a href="/" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition flex items-center gap-1.5">
               <i className="fa-solid fa-home"></i> View Website
             </a>
+            <form action={logoutAdmin}>
+              <button type="submit" className="text-sm font-semibold text-rose-500 hover:text-rose-700 transition flex items-center gap-1.5 cursor-pointer">
+                <i className="fa-solid fa-right-from-bracket"></i> Sign Out
+              </button>
+            </form>
           </div>
         </div>
       </header>
