@@ -133,7 +133,7 @@ export default function CertificateDashboard({ initialCertificates = [], courses
             <label className="text-xs font-extrabold text-gray-500 uppercase">Student Name</label>
             <input
               type="text"
-              placeholder="e.g. Dhathri Ramidi"
+              placeholder="e.g. John Doe"
               value={studentName}
               onChange={(e) => setStudentName(e.target.value)}
               className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500"

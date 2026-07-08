@@ -62,7 +62,7 @@ export default function AdminLogin() {
             <div className="relative">
               <input
                 type="email"
-                placeholder="saicharan@apextechsoftware.com"
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white font-medium"
