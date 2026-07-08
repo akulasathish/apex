@@ -37,8 +37,12 @@ def main():
     w = x_end - x_start
     h = y_end - y_start
     
-    # Crop a clean background patch of the same size from the top-left (y=100)
-    bg_patch = cert_img.crop((150, 100, 150 + w, 100 + h))
+    # Construct a clean bg_patch of size (w, h) by merging logo-free left and right patches
+    bg_patch = Image.new("RGB", (w, h))
+    left_bg = cert_img.crop((150, 100, 420, 100 + h))    # width 270
+    right_bg = cert_img.crop((600, 100, 870, 100 + h))  # width 270
+    bg_patch.paste(left_bg, (0, 0))
+    bg_patch.paste(right_bg, (270, 0))
     
     print("Erasing old dates while preserving the blue stamp...")
     for y in range(y_start, y_end):
@@ -47,7 +51,7 @@ def main():
             # Determine if it's the blue stamp ink (dominant blue channel)
             is_blue = (b > r + 15) and (b > g + 10) and (b > 60)
             if not is_blue:
-                # Replace with clean background texture pixel
+                # Replace with clean background texture pixel from the logo-free patch
                 bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
                 cert_img.putpixel((x, y), bg_pixel)
                 
