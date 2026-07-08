@@ -273,18 +273,13 @@ class ApexClassicCertificate(FPDF):
             self.set_x(photo_x)
             self.cell(photo_w, 4, "PLACEHOLDER", align="C")
 
-        # 7. Verification Barcode (Bottom-Left)
-        barcode_x = 24
-        barcode_y = 152
-        self.draw_code39(barcode_x, barcode_y, cert_id, height=10, width_narrow=0.25)
-        
-        # Text label under barcode (Certificate ID: ATS/APD/23/0789)
-        self.set_xy(barcode_x - 10, barcode_y + 11)
-        self.set_font("helvetica", "B", 8)
+        # 7. Verification Text (Bottom-Left)
+        self.set_xy(photo_x, 168)
+        self.set_font("times", "B", 10.5) # Using Times-like serif font as shown in the image
         self.set_text_color(15, 23, 42)
-        self.cell(55, 4, f"Certificate ID: {cert_id}", align="L")
+        self.cell(100, 5, f"Certificate ID: {cert_id}", align="L")
         
-        # 8. Signatures, Stamp & Gold Seal (Bottom-Right)
+        # 8. Signatures, Stamp & Barcode (Bottom-Right)
         # Signature
         sig_x = 135
         sig_y = 152
@@ -309,8 +304,10 @@ class ApexClassicCertificate(FPDF):
         # Blue Rubber Stamp
         self.draw_rubber_stamp(cx=212, cy=157)
         
-        # Gold Accreditation Seal
-        self.draw_gold_seal(cx=248, cy=157)
+        # Barcode (On the far right, replacing the gold seal)
+        barcode_x = 236
+        barcode_y = 152
+        self.draw_code39(barcode_x, barcode_y, cert_id, height=10, width_narrow=0.23)
 
         # Output the PDF file
         self.output(output_path)
@@ -319,9 +316,9 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Apex Tech Software Institute completion certificates based on classic image template.")
     parser.add_argument("-s", "--student", default="Dhathri Ramidi", help="Name of the student")
     parser.add_argument("-c", "--course", default="Advance Python Development", help="Name of the course completed")
-    parser.add_argument("-ds", "--date-start", default="December 5th", help="Course start date description")
-    parser.add_argument("-de", "--date-end", default="June 9th", help="Course end date description")
-    parser.add_argument("-i", "--id", default="ATS/APD/23/0789", help="Certificate ID")
+    parser.add_argument("-ds", "--date-start", default="December 5th, 2025", help="Course start date description")
+    parser.add_argument("-de", "--date-end", default="June 9th, 2026", help="Course end date description")
+    parser.add_argument("-i", "--id", default="ATS/APD/24/1001", help="Certificate ID")
     parser.add_argument("-p", "--photo", default=None, help="Path to student's face photo (JPEG/PNG)")
     parser.add_argument("-o", "--output", default="public/certificates/certificate_sample.pdf", help="Output path for the compiled PDF")
     
