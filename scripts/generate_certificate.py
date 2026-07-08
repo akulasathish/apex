@@ -347,7 +347,7 @@ class ApexClassicCertificate(FPDF):
 def main():
     parser = argparse.ArgumentParser(description="Generate Apex Tech Software Institute completion certificates based on classic image template.")
     parser.add_argument("-s", "--student", default="Dhathri Ramidi", help="Name of the student")
-    parser.add_argument("-c", "--course", default="Advance Python Development", help="Name of the course completed")
+    parser.add_argument("-c", "--course", default="Advanced Python Development", help="Name of the course completed")
     parser.add_argument("-ds", "--date-start", default="December 5th, 2025", help="Course start date description")
     parser.add_argument("-de", "--date-end", default="June 9th, 2026", help="Course end date description")
     parser.add_argument("-i", "--id", default="ATS/APD/24/1001", help="Certificate ID")
