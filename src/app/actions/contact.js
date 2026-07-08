@@ -1,9 +1,7 @@
 "use server";
 
-import fs from "fs/promises";
-import path from "path";
-
-const LEADS_FILE_PATH = path.join(process.cwd(), "src/data/leads.json");
+import { db } from "../../lib/gcp";
+import { revalidatePath } from "next/cache";
 
 export async function submitEnquiry(prevState, formData) {
   try {
@@ -21,9 +19,12 @@ export async function submitEnquiry(prevState, formData) {
       };
     }
 
+    // Generate unique ID
+    const leadId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+
     // Prepare new lead object
     const newLead = {
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      id: leadId,
       name,
       email: email || "N/A",
       phone,
@@ -33,90 +34,58 @@ export async function submitEnquiry(prevState, formData) {
       createdAt: new Date().toISOString(),
     };
 
-    // Read existing leads or initialize empty array
-    let leads = [];
-    try {
-      const dirPath = path.dirname(LEADS_FILE_PATH);
-      await fs.mkdir(dirPath, { recursive: true });
-
-      const fileExists = await fs.access(LEADS_FILE_PATH).then(() => true).catch(() => false);
-      if (fileExists) {
-        const fileContent = await fs.readFile(LEADS_FILE_PATH, "utf8");
-        leads = JSON.parse(fileContent);
-      }
-    } catch (e) {
-      console.error("Error checking or reading leads file:", e);
-      leads = [];
-    }
-
-    // Append new lead
-    leads.unshift(newLead);
-
-    // Write back to file
-    await fs.writeFile(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
+    // Save directly to Google Cloud Firestore database
+    await db.collection("leads").doc(leadId).set(newLead);
+    
+    revalidatePath("/admin");
 
     return {
       success: true,
       message: "Thank you! Your enquiry has been received. Our team will contact you shortly.",
     };
   } catch (error) {
-    console.error("Server error submitting enquiry:", error);
+    console.error("Server error submitting enquiry to Firestore:", error);
     return {
       success: false,
-      error: "Something went wrong. Please try again or contact us directly.",
+      error: "Could not submit enquiry. Please try again or contact us directly.",
     };
   }
 }
 
 export async function getLeads() {
   try {
-    const fileExists = await fs.access(LEADS_FILE_PATH).then(() => true).catch(() => false);
-    if (!fileExists) {
-      return [];
-    }
-    const fileContent = await fs.readFile(LEADS_FILE_PATH, "utf8");
-    return JSON.parse(fileContent);
+    const snapshot = await db.collection("leads").orderBy("createdAt", "desc").get();
+    const leads = [];
+    snapshot.forEach((doc) => {
+      leads.push(doc.data());
+    });
+    return leads;
   } catch (error) {
-    console.error("Error getting leads:", error);
+    console.error("Error getting leads from Firestore:", error);
     return [];
   }
 }
 
 export async function updateLeadStatus(id, newStatus) {
   try {
-    const fileExists = await fs.access(LEADS_FILE_PATH).then(() => true).catch(() => false);
-    if (!fileExists) return { success: false, error: "Leads database not found." };
-
-    const fileContent = await fs.readFile(LEADS_FILE_PATH, "utf8");
-    let leads = JSON.parse(fileContent);
-
-    const leadIndex = leads.findIndex((l) => l.id === id);
-    if (leadIndex === -1) return { success: false, error: "Lead not found." };
-
-    leads[leadIndex].status = newStatus;
-
-    await fs.writeFile(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
+    await db.collection("leads").doc(id).update({
+      status: newStatus
+    });
+    revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Error updating lead:", error);
+    console.error("Error updating lead status in Firestore:", error);
     return { success: false, error: error.message };
   }
 }
 
 export async function deleteLead(id) {
   try {
-    const fileExists = await fs.access(LEADS_FILE_PATH).then(() => true).catch(() => false);
-    if (!fileExists) return { success: false, error: "Leads database not found." };
-
-    const fileContent = await fs.readFile(LEADS_FILE_PATH, "utf8");
-    let leads = JSON.parse(fileContent);
-
-    leads = leads.filter((l) => l.id !== id);
-
-    await fs.writeFile(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
+    await db.collection("leads").doc(id).delete();
+    revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Error deleting lead:", error);
+    console.error("Error deleting lead in Firestore:", error);
     return { success: false, error: error.message };
   }
 }
