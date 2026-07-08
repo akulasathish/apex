@@ -2,26 +2,24 @@ import os
 import sys
 import argparse
 import warnings
+import math
 from datetime import datetime
 from fpdf import FPDF
 
-# Suppress FPDF2 deprecation warnings regarding new_x/new_y parameter transitions
+# Suppress FPDF2 deprecation warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-class ApexCertificatePDF(FPDF):
-    def __init__(self, logo_path, *args, **kwargs):
-        # Set orientation to landscape, unit to mm, format A4 (297mm x 210mm)
+class ApexClassicCertificate(FPDF):
+    def __init__(self, logo_path, photo_path=None, *args, **kwargs):
+        # Landscape A4: 297mm x 210mm
         super().__init__(orientation="L", unit="mm", format="A4", *args, **kwargs)
         self.logo_path = logo_path
+        self.photo_path = photo_path
 
-    def draw_code39(self, x, y, code, height=12, width_narrow=0.35, ratio=2.5):
+    def draw_code39(self, x, y, code, height=10, width_narrow=0.25, ratio=2.5):
         """
         Draws a Code 39 barcode directly onto the PDF using vector rectangles.
-        No external libraries required.
         """
-        # Code 39 pattern mapping for characters
-        # Each character consists of 9 elements (5 bars, 4 spaces).
-        # '0' = narrow, '1' = wide. Index 0, 2, 4, 6, 8 are bars; 1, 3, 5, 7 are spaces.
         encodings = {
             '0': '000110100', '1': '100100001', '2': '001100001', '3': '101100000',
             '4': '000110001', '5': '100110000', '6': '001110000', '7': '000100101',
@@ -46,8 +44,7 @@ class ApexCertificatePDF(FPDF):
         w_narrow = width_narrow
         w_wide = width_narrow * ratio
         
-        # Draw barcode bars
-        self.set_fill_color(0, 0, 0)
+        self.set_fill_color(11, 37, 64) # Navy blue ink for barcode matching design
         for char in code:
             if char not in encodings:
                 continue
@@ -59,198 +56,297 @@ class ApexCertificatePDF(FPDF):
                 
                 if is_bar:
                     self.rect(curr_x, y, w, height, 'F')
-                
                 curr_x += w
-            
-            # Inter-character gap
             curr_x += w_narrow
 
-    def build_certificate(self, student_name, course_name, completion_date, cert_id):
+    def draw_vintage_borders(self):
+        # Draw solid soft-textured background color (matches parchment)
+        self.set_fill_color(252, 251, 247)
+        self.rect(0, 0, 297, 210, 'F')
+        
+        # Outer thin Navy border
+        self.set_draw_color(11, 37, 64)
+        self.set_line_width(0.5)
+        self.rect(6, 6, 285, 198, 'D')
+        
+        # Inner thick Navy border with classic indented corners
+        self.set_line_width(1.3)
+        # Top
+        self.line(20, 9, 277, 9)
+        # Bottom
+        self.line(20, 201, 277, 201)
+        # Left
+        self.line(9, 20, 9, 190)
+        # Right
+        self.line(288, 20, 288, 190)
+        
+        # Outer indents
+        self.line(20, 9, 20, 20)
+        self.line(20, 20, 9, 20)
+        self.line(277, 9, 277, 20)
+        self.line(277, 20, 288, 20)
+        self.line(20, 201, 20, 190)
+        self.line(20, 190, 9, 190)
+        self.line(277, 201, 277, 190)
+        self.line(277, 190, 288, 190)
+
+        # Second parallel inner thin line (1.5mm offset for double-bordered look)
+        self.set_line_width(0.3)
+        # Top
+        self.line(21.5, 10.5, 275.5, 10.5)
+        # Bottom
+        self.line(21.5, 199.5, 275.5, 199.5)
+        # Left
+        self.line(10.5, 21.5, 10.5, 188.5)
+        # Right
+        self.line(286.5, 21.5, 286.5, 188.5)
+        
+        # Inner indents
+        self.line(21.5, 10.5, 21.5, 21.5)
+        self.line(21.5, 21.5, 10.5, 21.5)
+        self.line(275.5, 10.5, 275.5, 21.5)
+        self.line(275.5, 21.5, 286.5, 21.5)
+        self.line(21.5, 199.5, 21.5, 188.5)
+        self.line(21.5, 188.5, 10.5, 188.5)
+        self.line(275.5, 199.5, 275.5, 188.5)
+        self.line(275.5, 188.5, 286.5, 188.5)
+
+    def draw_rubber_stamp(self, cx, cy):
+        self.set_draw_color(11, 37, 64)
+        self.set_line_width(0.4)
+        # Outer stamp circle (22mm diameter)
+        self.ellipse(cx - 11, cy - 11, 22, 22, 'D')
+        # Inner stamp circle (16mm diameter)
+        self.ellipse(cx - 8, cy - 8, 16, 16, 'D')
+        
+        # Stamp Text details
+        self.set_text_color(11, 37, 64)
+        self.set_font("helvetica", "B", 4)
+        
+        # Top half
+        self.set_xy(cx - 11, cy - 6)
+        self.cell(22, 2, "APEX TECH", align="C", ln=True)
+        self.set_x(cx - 11)
+        self.cell(22, 2, "SOFTWARE INST.", align="C", ln=True)
+        
+        # Center Vertical (Hyderabad)
+        self.set_font("times", "B", 5)
+        self.set_xy(cx - 11, cy - 1.5)
+        self.cell(22, 3, "Hyderabad", align="C", ln=True)
+        
+        # Bottom half
+        self.set_font("helvetica", "B", 4.2)
+        self.set_xy(cx - 11, cy + 2.5)
+        self.cell(22, 2.5, "* HYDERABAD *", align="C")
+
+    def draw_gold_seal(self, cx, cy):
+        # Main gold base circle
+        self.set_fill_color(225, 190, 85) # Golden yellow
+        self.ellipse(cx - 11, cy - 11, 22, 22, 'F')
+        
+        # Serrated effect outer border (draw 36 small overlapping circles for serrations)
+        self.set_fill_color(212, 175, 55) # Darker gold
+        for i in range(36):
+            angle = i * (2 * math.pi / 36)
+            sx = cx + 10.5 * math.cos(angle)
+            sy = cy + 10.5 * math.sin(angle)
+            self.ellipse(sx - 1.2, sy - 1.2, 2.4, 2.4, 'F')
+            
+        # Inner lighter gold layer
+        self.set_fill_color(250, 220, 120)
+        self.ellipse(cx - 9, cy - 9, 18, 18, 'F')
+        
+        # Inner decorative circle line
+        self.set_draw_color(180, 140, 30)
+        self.set_line_width(0.35)
+        self.ellipse(cx - 7, cy - 7, 14, 14, 'D')
+        
+        # Center Star coordinates
+        R = 4
+        r = 1.8
+        points = []
+        for i in range(10):
+            angle = i * math.pi / 5 - math.pi / 2
+            rad = R if i % 2 == 0 else r
+            px = cx + rad * math.cos(angle)
+            py = cy + rad * math.sin(angle)
+            points.append((px, py))
+            
+        # Draw 5-pointed star
+        self.set_draw_color(180, 140, 30)
+        self.set_line_width(0.4)
+        for i in range(10):
+            p1 = points[i]
+            p2 = points[(i + 1) % 10]
+            self.line(p1[0], p1[1], p2[0], p2[1])
+
+    def generate_pdf(self, student_name, course_title, date_start, date_end, cert_id, output_path):
         self.alias_nb_pages()
         self.add_page()
         
-        # ----------------------------------------------------
-        # 1. PREMIUM BACKGROUND & DOUBLE BORDER
-        # ----------------------------------------------------
-        # Soft cream/off-white background
-        self.set_fill_color(250, 249, 246)
-        self.rect(0, 0, 297, 210, 'F')
+        # 1. Vintage Borders
+        self.draw_vintage_borders()
         
-        # Outer thick border - Navy Blue (#0B2540)
-        self.set_draw_color(11, 37, 64)
-        self.set_line_width(1.5)
-        self.rect(10, 10, 277, 190)
-        
-        # Inner thin border - Gold (#D4AF37)
-        self.set_draw_color(212, 175, 55)
-        self.set_line_width(0.6)
-        self.rect(12, 12, 273, 186)
-        
-        # Corner accent flourishes (Gold)
-        flourish_size = 8
-        # Top-Left
-        self.line(12, 12 + flourish_size, 12 + flourish_size, 12)
-        # Top-Right
-        self.line(285 - flourish_size, 12, 285, 12 + flourish_size)
-        # Bottom-Left
-        self.line(12, 198 - flourish_size, 12 + flourish_size, 198)
-        # Bottom-Right
-        self.line(285 - flourish_size, 198, 285, 198 - flourish_size)
-
-        # ----------------------------------------------------
-        # 2. INSTITUTIONAL HEADER & BRANDING
-        # ----------------------------------------------------
-        # Company Logo (Placed at top-center)
-        logo_w = 28
-        logo_h = 28
-        logo_x = (297 - logo_w) / 2
+        # 2. Top-Center Circular Logo
+        logo_size = 22
+        logo_x = (297 - logo_size) / 2
         if os.path.exists(self.logo_path):
-            self.image(self.logo_path, logo_x, 18, logo_w)
+            self.image(self.logo_path, logo_x, 15, logo_size, logo_size)
+            
+        # 3. Headers
+        self.set_y(41)
+        self.set_font("helvetica", "B", 18.5)
+        self.set_text_color(11, 37, 64) # Navy Blue
+        self.cell(0, 6, "APEX TECH SOFTWARE INSTITUTE", align="C", ln=True)
         
-        # Institution Name
         self.set_y(48)
-        self.set_font("helvetica", "B", 18)
-        self.set_text_color(11, 37, 64) # Navy Blue
-        self.cell(0, 7, "APEX TECH SOFTWARE INSTITUTE", ln=True, align="C")
-        
-        # Credentials Subtitle
-        self.set_font("helvetica", "I", 9)
-        self.set_text_color(0, 163, 166) # Technical Teal
-        self.cell(0, 4.5, "Regd. No. TS/HYD/1094/2026 | ISO 9001:2015 Certified | A Grade Accredited Training Center", ln=True, align="C")
-        
-        # Divider Line
-        self.set_draw_color(226, 232, 240)
-        self.set_line_width(0.4)
-        self.line(80, 62, 217, 62)
-
-        # ----------------------------------------------------
-        # 3. CERTIFICATE TITLE
-        # ----------------------------------------------------
-        self.set_y(67)
-        self.set_font("times", "BI", 24)
-        self.set_text_color(212, 175, 55) # Gold
-        self.cell(0, 8, "CERTIFICATE OF COMPLETION", ln=True, align="C")
-        
-        # ----------------------------------------------------
-        # 4. RECIPIENT & ACHIEVEMENT TEXT
-        # ----------------------------------------------------
-        self.set_y(80)
-        self.set_font("times", "I", 12.5)
-        self.set_text_color(100, 116, 139) # Slate-500
-        self.cell(0, 6, "This is proudly presented to", ln=True, align="C")
-        
-        # Student Name (Large and prominent)
-        self.set_y(90)
-        self.set_font("helvetica", "B", 26)
-        self.set_text_color(11, 37, 64) # Navy Blue
-        self.cell(0, 12, student_name.upper(), ln=True, align="C")
-        
-        # Underline for name
-        self.set_draw_color(11, 37, 64)
-        self.set_line_width(0.7)
-        self.line(70, 103, 227, 103)
-        
-        # Completion description
-        self.set_y(108)
-        self.set_font("times", "I", 12.5)
-        self.set_text_color(100, 116, 139)
-        self.cell(0, 6, "for successfully completing the advanced industry curriculum and practical laboratory labs for", ln=True, align="C")
-        
-        # Course Name (Large, Bold Teal)
-        self.set_y(116)
-        self.set_font("helvetica", "B", 18)
-        self.set_text_color(0, 163, 166) # Teal
-        self.cell(0, 10, course_name, ln=True, align="C")
-        
-        # Date and accreditation
-        self.set_y(128)
-        self.set_font("times", "I", 11.5)
-        self.set_text_color(100, 116, 139)
-        self.cell(0, 6, f"Conferred on {completion_date} at Hyderabad, India", ln=True, align="C")
-
-        # ----------------------------------------------------
-        # 5. FOOTER SECTION: SIGNATURE & BARCODE VERIFICATION
-        # ----------------------------------------------------
-        # Divider Line
-        self.line(20, 142, 277, 142)
-        
-        # Left Block: Authorized Signature
-        sig_y = 148
-        self.set_xy(30, sig_y)
-        self.set_font("times", "BI", 14)
+        self.set_font("helvetica", "", 8.5)
         self.set_text_color(11, 37, 64)
-        # Mocking a cursive hand-signature
-        self.cell(60, 6, "Sathish Akula", ln=True, align="C")
+        self.cell(0, 4, "apextechsoftwareinstitute.com", align="C", ln=True)
         
-        # Signature Underline
-        self.set_draw_color(148, 163, 184)
-        self.set_line_width(0.3)
-        self.line(30, sig_y + 7, 90, sig_y + 7)
+        self.set_y(57)
+        self.set_font("times", "B", 18)
+        self.set_text_color(30, 41, 59) # Slate Dark
+        self.cell(0, 6, "CERTIFICATE OF COMPLETION", align="C", ln=True)
         
-        self.set_xy(30, sig_y + 8)
+        self.set_y(65)
+        self.set_font("times", "I", 10)
+        self.set_text_color(71, 85, 105)
+        self.cell(0, 5, "THIS IS TO CERTIFY THAT", align="C", ln=True)
+        
+        # 4. Student Name (Large Serif Italic)
+        self.set_y(73)
+        self.set_font("times", "BI", 26)
+        self.set_text_color(11, 37, 64)
+        self.cell(0, 10, student_name.upper(), align="C", ln=True)
+        
+        # 5. Course Complete Description
+        self.set_y(86)
+        self.set_font("times", "I", 11.5)
+        self.set_text_color(71, 85, 105)
+        self.cell(0, 5, "has successfully completed the rigorous course titled", align="C", ln=True)
+        
+        # Course Name (Large Bold Sans-serif)
+        self.set_y(93)
+        self.set_font("helvetica", "B", 15)
+        self.set_text_color(15, 23, 42)
+        self.cell(0, 7, course_title.upper(), align="C", ln=True)
+        
+        # Period descriptor
+        self.set_y(102)
+        self.set_font("times", "I", 11.5)
+        self.set_text_color(71, 85, 105)
+        self.cell(0, 5, "demonstrating proficiency and dedication during the period from", align="C", ln=True)
+        
+        # Date range
+        self.set_y(109)
+        self.set_font("helvetica", "B", 13.5)
+        self.set_text_color(15, 23, 42)
+        date_range_str = f"{date_start.upper()} TO {date_end.upper()}."
+        self.cell(0, 6, date_range_str, align="C", ln=True)
+        
+        # 6. Framed Student Photo (Left-aligned)
+        photo_x = 24
+        photo_y = 66
+        photo_w = 34
+        photo_h = 42
+        
+        if self.photo_path and os.path.exists(self.photo_path):
+            # Render photo image
+            self.image(self.photo_path, photo_x, photo_y, photo_w, photo_h)
+            # Render black frame outline around photo
+            self.set_draw_color(0, 0, 0)
+            self.set_line_width(0.3)
+            self.rect(photo_x, photo_y, photo_w, photo_h, 'D')
+        else:
+            # Placeholder box
+            self.set_fill_color(243, 244, 246) # Light grey bg
+            self.rect(photo_x, photo_y, photo_w, photo_h, 'F')
+            self.set_draw_color(156, 163, 175) # Border
+            self.set_line_width(0.25)
+            self.rect(photo_x, photo_y, photo_w, photo_h, 'D')
+            # Text inside placeholder
+            self.set_xy(photo_x, photo_y + 16)
+            self.set_font("helvetica", "I", 7)
+            self.set_text_color(156, 163, 175)
+            self.cell(photo_w, 4, "[ STUDENT PHOTO ]", align="C", ln=True)
+            self.set_x(photo_x)
+            self.cell(photo_w, 4, "PLACEHOLDER", align="C")
+
+        # 7. Verification Barcode (Bottom-Left)
+        barcode_x = 24
+        barcode_y = 152
+        self.draw_code39(barcode_x, barcode_y, cert_id, height=10, width_narrow=0.25)
+        
+        # Text label under barcode (Certificate ID: ATS/APD/23/0789)
+        self.set_xy(barcode_x - 10, barcode_y + 11)
         self.set_font("helvetica", "B", 8)
-        self.set_text_color(100, 116, 139)
-        self.cell(60, 4, "DIRECTOR & HEAD OF ACADEMICS", ln=True, align="C")
+        self.set_text_color(15, 23, 42)
+        self.cell(55, 4, f"Certificate ID: {cert_id}", align="L")
         
-        # Right Block: Barcode Verification
-        # Let's calculate x-pos for barcode to center it under the right column
-        barcode_x = 175
-        barcode_y = 148
+        # 8. Signatures, Stamp & Gold Seal (Bottom-Right)
+        # Signature
+        sig_x = 135
+        sig_y = 152
+        self.set_xy(sig_x, sig_y)
+        self.set_font("times", "BI", 13)
+        self.set_text_color(11, 37, 64)
+        self.cell(50, 5, "Sai Charan", align="C", ln=True)
         
-        # Draw the vector Code 39 barcode
-        self.draw_code39(barcode_x, barcode_y, cert_id, height=12, width_narrow=0.25)
+        # Signature Line
+        self.set_draw_color(148, 163, 184)
+        self.set_line_width(0.25)
+        self.line(135, sig_y + 5, 185, sig_y + 5)
         
-        # Draw human-readable ID below barcode
-        self.set_xy(barcode_x, barcode_y + 13)
-        self.set_font("courier", "B", 9)
-        self.set_text_color(0, 0, 0)
-        # Standard barcode print has asterisks on boundary
-        self.cell(60, 4, f"* {cert_id} *", ln=True, align="C")
+        # Signature Title
+        self.set_xy(sig_x, sig_y + 6)
+        self.set_font("helvetica", "", 7.5)
+        self.set_text_color(71, 85, 105)
+        self.cell(50, 4, "Sai Charan,", align="C", ln=True)
+        self.set_x(sig_x)
+        self.cell(50, 3, "CEO", align="C")
         
-        # Scan to verify notice
-        self.set_xy(barcode_x - 10, barcode_y + 17)
-        self.set_font("helvetica", "I", 7.5)
-        self.set_text_color(148, 163, 184)
-        self.cell(80, 3, "Credential authentication barcode. Scan or visit portal to verify.", ln=True, align="C")
+        # Blue Rubber Stamp
+        self.draw_rubber_stamp(cx=212, cy=157)
+        
+        # Gold Accreditation Seal
+        self.draw_gold_seal(cx=248, cy=157)
+
+        # Output the PDF file
+        self.output(output_path)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Apex Tech Software Institute completion certificates.")
-    parser.add_argument("-s", "--student", default="Sathish Akula", help="Name of the student")
-    parser.add_argument("-c", "--course", default="Advanced AWS & DevOps Program", help="Name of the course completed")
-    parser.add_argument("-d", "--date", default=None, help="Conferred date (default: today)")
-    parser.add_argument("-i", "--id", default=None, help="Certificate verification ID")
+    parser = argparse.ArgumentParser(description="Generate Apex Tech Software Institute completion certificates based on classic image template.")
+    parser.add_argument("-s", "--student", default="Dhathri Ramidi", help="Name of the student")
+    parser.add_argument("-c", "--course", default="Advance Python Development", help="Name of the course completed")
+    parser.add_argument("-ds", "--date-start", default="December 5th", help="Course start date description")
+    parser.add_argument("-de", "--date-end", default="June 9th", help="Course end date description")
+    parser.add_argument("-i", "--id", default="ATS/APD/23/0789", help="Certificate ID")
+    parser.add_argument("-p", "--photo", default=None, help="Path to student's face photo (JPEG/PNG)")
     parser.add_argument("-o", "--output", default="public/certificates/certificate_sample.pdf", help="Output path for the compiled PDF")
     
     args = parser.parse_args()
     
     # Defaults
-    logo_path = "public/logo.png"
-    
-    date_str = args.date
-    if not date_str:
-        date_str = datetime.now().strftime("%B %d, %Y")
+    logo_path = "public/logo_backup.png" # Using backup original square logo if available
+    if not os.path.exists(logo_path):
+        logo_path = "public/logo.png"
         
-    cert_id = args.id
-    if not cert_id:
-        # Generate a unique pseudo-random ID
-        import random
-        num = random.randint(10000, 99999)
-        year = datetime.now().year
-        cert_id = f"APEX-{year}-{num}"
-        
-    # Ensure output directory exists
-    out_dir = os.path.dirname(args.output)
-    if out_dir and not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-        
-    print(f"Generating certificate for: {args.student}")
+    print(f"Generating classic certificate for: {args.student}")
     print(f"Course: {args.course}")
-    print(f"Certificate ID: {cert_id}")
-    print(f"Output location: {args.output}")
+    print(f"Certificate ID: {args.id}")
+    print(f"Photo: {args.photo}")
+    print(f"Output: {args.output}")
     
-    pdf = ApexCertificatePDF(logo_path=logo_path)
-    pdf.build_certificate(args.student, args.course, date_str, cert_id)
-    pdf.output(args.output)
+    pdf = ApexClassicCertificate(logo_path=logo_path, photo_path=args.photo)
+    pdf.generate_pdf(
+        student_name=args.student,
+        course_title=args.course,
+        date_start=args.date_start,
+        date_end=args.date_end,
+        cert_id=args.id,
+        output_path=args.output
+    )
     print("Certificate successfully generated!")
 
 if __name__ == "__main__":
