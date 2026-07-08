@@ -26,6 +26,9 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
+# Install Python, Pillow, QR Code library, and Liberation True-Type Fonts
+RUN apk add --no-cache python3 py3-pillow py3-qrcode ttf-liberation
+
 ENV NODE_ENV=production
 # Disable Next.js runtime telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -42,6 +45,7 @@ RUN chown nextjs:nodejs .next
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
