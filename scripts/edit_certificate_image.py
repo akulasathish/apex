@@ -35,32 +35,19 @@ def main():
     cert_img = Image.open(template_path).convert("RGB")
     w, h = cert_img.size
     
-    # 1. Clean parchment crops to erase the old logo/text at the top (X: 80 to w-80, Y: 15 to 255)
-    # Crop a clean horizontal strip from the bottom-left area (where there is no text/logo/stamps/signatures on the template)
-    clean_patch = cert_img.crop((100, 545, 300, 615)) # width 200, height 70
+    # Keep the original circular logo and institute headers 100% untouched. No top erasure patches.
     
-    # Tile horizontally and vertically to erase all old headers
-    for y_dest in [15, 85, 155, 185]:
-        for x_dest in [80, 280, 480, 680, 800]:
-            cert_img.paste(clean_patch, (x_dest, y_dest))
-
-    # Paste the new transparent logo centered horizontally at the top
-    logo_path = "public/logo.png"
-    if os.path.exists(logo_path):
-        print("Drawing new logo on certificate...")
-        logo_img = Image.open(logo_path).convert("RGBA")
-        logo_w = 320
-        logo_h = int(logo_img.height * (logo_w / logo_img.width))
-        logo_resized = logo_img.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-        logo_x = (w - logo_w) // 2
-        logo_y = 15 + (140 - logo_h) // 2
-        cert_img.paste(logo_resized, (logo_x, logo_y), logo_resized)
+    # 1. Erase the old student name completely (X: 200 to 800, Y: 310 to 380)
+    # Using clean bottom-left patch X: 100-200, Y: 545-615 (height 70, width 100)
+    left_name_patch = cert_img.crop((100, 545, 200, 615))
+    for x_dest in [200, 300, 400, 500, 600, 700]:
+        cert_img.paste(left_name_patch, (x_dest, 310))
     
-    # 2. Seamless texture patch covering of old course title (no stamp here)
-    left_patch_course = cert_img.crop((150, 100, 420, 140))
-    right_patch_course = cert_img.crop((600, 100, 870, 140))
-    cert_img.paste(left_patch_course, (242, 413))
-    cert_img.paste(right_patch_course, (512, 413))
+    # 2. Erase the old course title completely (X: 242 to 782, Y: 413 to 453)
+    # Using clean bottom-left patch height 40 (Y: 545-585)
+    clean_course_patch = cert_img.crop((100, 545, 200, 585))
+    for x_dest in [242, 342, 442, 542, 642, 742]:
+        cert_img.paste(clean_course_patch, (x_dest, 413))
     
     # 3. Smart pixel-level erase for the dates region (preserves blue stamp pixels)
     x_start, y_start = 240, 492
@@ -68,12 +55,14 @@ def main():
     pw = x_end - x_start
     ph = y_end - y_start
     
-    # Construct a clean bg_patch of size (pw, ph) by merging logo-free left and right patches
     bg_patch = Image.new("RGB", (pw, ph))
-    left_bg = cert_img.crop((150, 100, 420, 100 + ph))    # width 270
-    right_bg = cert_img.crop((600, 100, 870, 100 + ph))  # width 270
+    left_bg = cert_img.crop((100, 545, 200, 545 + ph))
+    right_bg = cert_img.crop((200, 545, 300, 545 + ph))
     bg_patch.paste(left_bg, (0, 0))
-    bg_patch.paste(right_bg, (270, 0))
+    bg_patch.paste(right_bg, (100, 0))
+    bg_patch.paste(left_bg, (200, 0))
+    bg_patch.paste(right_bg, (300, 0))
+    bg_patch.paste(left_bg, (400, 0))
     
     for y in range(y_start, y_end):
         for x in range(x_start, x_end):
@@ -81,13 +70,12 @@ def main():
             # Determine if it's the blue stamp ink (dominant blue channel)
             is_blue = (b > r + 15) and (b > g + 10) and (b > 60)
             if not is_blue:
-                # Replace with clean background texture pixel from the logo-free patch
                 bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
                 cert_img.putpixel((x, y), bg_pixel)
                 
     # 4. Erase ONLY the old Certificate ID value (keep the Certificate ID: label on the template)
     id_val_erase = cert_img.crop((100, 545, 300, 570)) # width 200, height 25
-    cert_img.paste(id_val_erase, (175, 622)) # Start at 175 to perfectly erase the value only
+    cert_img.paste(id_val_erase, (175, 622)) # Erase starting at 175, protecting ':' and space before
     
     # Draw new ID next to the label (starts at 180)
     draw = ImageDraw.Draw(cert_img)
@@ -98,22 +86,7 @@ def main():
     font_id = ImageFont.truetype(font_path_bold, 15)
     draw.text((180, 625), args.id, font=font_id, fill=(15, 23, 42))
 
-    # 5. Erase the old student name completely (X: 200 to 800, Y: 310 to 380)
-    # Using clean side column patches: X: 70-170, Y: 70-140 for left; X: 854-954, Y: 70-140 for right
-    left_name_patch = cert_img.crop((70, 70, 170, 140))   # size 100 x 70
-    right_name_patch = cert_img.crop((854, 70, 954, 140)) # size 100 x 70
-    
-    # Tile left patch for the left half
-    cert_img.paste(left_name_patch, (200, 310))
-    cert_img.paste(left_name_patch, (300, 310))
-    cert_img.paste(left_name_patch, (400, 310))
-    
-    # Tile right patch for the right half
-    cert_img.paste(right_name_patch, (500, 310))
-    cert_img.paste(right_name_patch, (600, 310))
-    cert_img.paste(right_name_patch, (700, 310))
-    
-    # Draw the student's name in UPPERCASE to match the template style
+    # 5. Draw the student's name in UPPERCASE to match the template style
     font_path_serif_italic = "/usr/share/fonts/liberation/LiberationSerif-BoldItalic.ttf"
     font_name = ImageFont.truetype(font_path_serif_italic, 32)
     draw_centered_text(draw, args.student.upper(), 340, font_name, fill=(15, 23, 42))
@@ -126,21 +99,17 @@ def main():
     draw_centered_text(draw, args.course.upper(), 416, font_course, fill=(15, 23, 42))
     
     # Draw dates
-    dates_text = f"{args.date_start} to {args.date_end}."
+    dates_text = f"{args.date_start.upper()} TO {args.date_end.upper()}."
     draw_centered_text(draw, dates_text, 498, font_dates, fill=(15, 23, 42))
     
-    # 7. Draw location of the institute inside the border frame, centered under the logo
-    font_location = ImageFont.truetype(font_path_bold, 13)
-    draw_centered_text(draw, "Kondapur, Hyderabad, Telangana.", 155, font_location, fill=(71, 85, 105))
-    
-    # 8. If custom student photo is provided, resize and paste it inside the photo box
+    # 7. If custom student photo is provided, resize and paste it inside the photo box
     if args.photo and os.path.exists(args.photo):
         print(f"Loading student photo: {args.photo}")
         photo_img = Image.open(args.photo).convert("RGB")
         photo_resized = photo_img.resize((120, 146), Image.Resampling.LANCZOS)
         cert_img.paste(photo_resized, (103, 290))
         
-    # 9. Generate and paste the verification QR Code on the right side
+    # 8. Generate and paste the verification QR Code on the right side
     verify_url = f"{args.url_host}/verify/{args.id}"
     print(f"Generating QR code for: {verify_url}")
     
@@ -157,19 +126,13 @@ def main():
     qr_img_resized = qr_img.resize((90, 90), Image.Resampling.LANCZOS)
     cert_img.paste(qr_img_resized, (836, 535))
     
-    # 10. Wrap inside A4 Landscape canvas with margins and save the PDF
-    a4_w, a4_h = 1169, 827
-    a4_canvas = Image.new("RGB", (a4_w, a4_h), "white")
-    x_offset = (a4_w - w) // 2
-    y_offset = (a4_h - h) // 2
-    a4_canvas.paste(cert_img, (x_offset, y_offset))
-    
+    # 9. Save the modified JPEG directly to PDF (classic look, full bleed, stable borders)
     output_dir = os.path.dirname(args.output)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
         
-    a4_canvas.save(args.output, "PDF", resolution=100.0)
-    print(f"Success: Certificate generated and saved to A4 landscape PDF: {args.output}")
+    cert_img.save(args.output, "PDF", resolution=100.0)
+    print(f"Success: Certificate generated and saved to: {args.output}")
 
 if __name__ == "__main__":
     main()
