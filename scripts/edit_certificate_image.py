@@ -85,26 +85,23 @@ def main():
                 bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
                 cert_img.putpixel((x, y), bg_pixel)
                 
-    # 4. Erase the old Certificate ID and draw the new one
+    # 4. Erase ONLY the old Certificate ID value (keep the Certificate ID: label on the template)
+    id_val_erase = cert_img.crop((100, 545, 300, 570)) # width 200, height 25
+    cert_img.paste(id_val_erase, (175, 622)) # Start at 175 to perfectly erase the value only
+    
+    # Draw new ID next to the label (starts at 180)
     draw = ImageDraw.Draw(cert_img)
     font_path_bold = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
     if not os.path.exists(font_path_bold):
         font_path_bold = "DejaVuSans-Bold.ttf" # Fallback if run on other machines
         
     font_id = ImageFont.truetype(font_path_bold, 15)
-    
-    # Erase old ID
-    id_bg_patch = cert_img.crop((150, 100, 400, 130)) # width 250, height 30
-    cert_img.paste(id_bg_patch, (170, 622))
-    
-    # Draw new ID
-    id_text = f"Certificate ID: {args.id}"
-    draw.text((70, 625), id_text, font=font_id, fill=(15, 23, 42))
+    draw.text((180, 625), args.id, font=font_id, fill=(15, 23, 42))
 
-    # 5. Erase the old student name completely (X: 200 to 800, Y: 310 to 400)
-    # Using clean side column patches: X: 70-170, Y: 70-160 for left; X: 854-954, Y: 70-160 for right
-    left_name_patch = cert_img.crop((70, 70, 170, 160))   # size 100 x 90
-    right_name_patch = cert_img.crop((854, 70, 954, 160)) # size 100 x 90
+    # 5. Erase the old student name completely (X: 200 to 800, Y: 310 to 380)
+    # Using clean side column patches: X: 70-170, Y: 70-140 for left; X: 854-954, Y: 70-140 for right
+    left_name_patch = cert_img.crop((70, 70, 170, 140))   # size 100 x 70
+    right_name_patch = cert_img.crop((854, 70, 954, 140)) # size 100 x 70
     
     # Tile left patch for the left half
     cert_img.paste(left_name_patch, (200, 310))
@@ -132,9 +129,9 @@ def main():
     dates_text = f"{args.date_start} to {args.date_end}."
     draw_centered_text(draw, dates_text, 498, font_dates, fill=(15, 23, 42))
     
-    # 7. Draw address footer at the bottom center (subtle slate grey)
-    font_address = ImageFont.truetype(font_path_bold, 13)
-    draw_centered_text(draw, "Address: Kondapur, Hyderabad, Telangana.", 705, font_address, fill=(100, 116, 139))
+    # 7. Draw location of the institute inside the border frame, centered under the logo
+    font_location = ImageFont.truetype(font_path_bold, 13)
+    draw_centered_text(draw, "Kondapur, Hyderabad, Telangana.", 155, font_location, fill=(71, 85, 105))
     
     # 8. If custom student photo is provided, resize and paste it inside the photo box
     if args.photo and os.path.exists(args.photo):
@@ -160,13 +157,19 @@ def main():
     qr_img_resized = qr_img.resize((90, 90), Image.Resampling.LANCZOS)
     cert_img.paste(qr_img_resized, (836, 535))
     
-    # 10. Save the modified JPEG
+    # 10. Wrap inside A4 Landscape canvas with margins and save the PDF
+    a4_w, a4_h = 1169, 827
+    a4_canvas = Image.new("RGB", (a4_w, a4_h), "white")
+    x_offset = (a4_w - w) // 2
+    y_offset = (a4_h - h) // 2
+    a4_canvas.paste(cert_img, (x_offset, y_offset))
+    
     output_dir = os.path.dirname(args.output)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
         
-    cert_img.save(args.output, "PDF", resolution=100.0)
-    print(f"Success: Certificate generated and saved to: {args.output}")
+    a4_canvas.save(args.output, "PDF", resolution=100.0)
+    print(f"Success: Certificate generated and saved to A4 landscape PDF: {args.output}")
 
 if __name__ == "__main__":
     main()
