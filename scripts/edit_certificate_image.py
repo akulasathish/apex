@@ -10,7 +10,8 @@ def draw_centered_text(draw, text, y, font, fill=(15, 23, 42)):
     draw.text((x, y), text, font=font, fill=fill)
 
 def main():
-    original_image_path = "/home/sathish/Downloads/WhatsApp Image 2026-07-08 at 6.19.28 PM.jpeg"
+    # Use the backup media copy of the original WhatsApp JPEG image
+    original_image_path = "/home/sathish/.gemini/antigravity-cli/brain/945b84e0-8df5-4fc5-80da-5c062790cb61/.tempmediaStorage/media_945b84e0-8df5-4fc5-80da-5c062790cb61_1783515334723.jpg"
     output_jpeg_path = "public/certificates/ATS-APD-24-1001.jpeg"
     output_pdf_path = "public/certificates/ATS-APD-24-1001.pdf"
     
@@ -24,23 +25,33 @@ def main():
     print(f"Loading original image: {original_image_path}")
     cert_img = Image.open(original_image_path).convert("RGB")
     
-    # 1. Seamless texture patch covering of old text lines (bypassing center logo)
-    # We crop 270px wide patches from top-left and top-right (avoiding logo at x=450-570)
-    # and paste them side-by-side to cover the 540px wide text area (x=242 to x=782)
-    
-    # Patch for Course Title (height: 40px)
+    # 1. Seamless texture patch covering of course title (no stamp here)
     left_patch_course = cert_img.crop((150, 100, 420, 140))
     right_patch_course = cert_img.crop((600, 100, 870, 140))
     cert_img.paste(left_patch_course, (242, 413))
     cert_img.paste(right_patch_course, (512, 413))
     
-    # Patch for Dates (height: 36px)
-    left_patch_dates = cert_img.crop((150, 100, 420, 136))
-    right_patch_dates = cert_img.crop((600, 100, 870, 136))
-    cert_img.paste(left_patch_dates, (242, 494))
-    cert_img.paste(right_patch_dates, (512, 494))
+    # 2. Smart pixel-level erase for the dates region (preserves blue stamp pixels)
+    x_start, y_start = 240, 492
+    x_end, y_end = 780, 530
+    w = x_end - x_start
+    h = y_end - y_start
     
-    # 2. Draw corrected text lines using true-type font on top of the seamless patches
+    # Crop a clean background patch of the same size from the top-left (y=100)
+    bg_patch = cert_img.crop((150, 100, 150 + w, 100 + h))
+    
+    print("Erasing old dates while preserving the blue stamp...")
+    for y in range(y_start, y_end):
+        for x in range(x_start, x_end):
+            r, g, b = cert_img.getpixel((x, y))
+            # Determine if it's the blue stamp ink (dominant blue channel)
+            is_blue = (b > r + 15) and (b > g + 10) and (b > 60)
+            if not is_blue:
+                # Replace with clean background texture pixel
+                bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
+                cert_img.putpixel((x, y), bg_pixel)
+                
+    # 3. Draw corrected text lines using true-type font
     draw = ImageDraw.Draw(cert_img)
     font_course = ImageFont.truetype(font_path_bold, 25.5)
     font_dates = ImageFont.truetype(font_path_bold, 20)
@@ -51,7 +62,7 @@ def main():
     # Draw corrected date range: "JAN 5TH, 2025 to JUNE 3RD, 2025."
     draw_centered_text(draw, "JAN 5TH, 2025 to JUNE 3RD, 2025.", 498, font_dates, fill=(15, 23, 42))
     
-    # 3. Generate and paste the verification QR Code on the right side
+    # 4. Generate and paste the verification QR Code on the right side
     cert_id = "ATS/APD/24/1001"
     verify_url = f"https://apex-web-app-967134820705.us-central1.run.app/verify/{cert_id}"
     print(f"Generating QR code for: {verify_url}")
@@ -77,12 +88,12 @@ def main():
     print(f"Pasting QR code at coordinates: ({paste_x}, {paste_y})")
     cert_img.paste(qr_img_resized, (paste_x, paste_y))
     
-    # 4. Save the modified JPEG
+    # 5. Save the modified JPEG
     os.makedirs(os.path.dirname(output_jpeg_path), exist_ok=True)
     cert_img.save(output_jpeg_path, "JPEG", quality=95)
     print(f"Modified JPEG saved to: {output_jpeg_path}")
     
-    # 5. Convert the modified image directly to PDF to maintain 100% visual fidelity
+    # 6. Convert the modified image directly to PDF to maintain 100% visual fidelity
     cert_img.save(output_pdf_path, "PDF", resolution=100.0)
     print(f"Final PDF compiled and saved to: {output_pdf_path}")
     print("Verification certificate edit complete!")
