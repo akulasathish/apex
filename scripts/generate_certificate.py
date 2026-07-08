@@ -3,6 +3,7 @@ import sys
 import argparse
 import warnings
 import math
+import qrcode
 from datetime import datetime
 from fpdf import FPDF
 
@@ -279,38 +280,74 @@ class ApexClassicCertificate(FPDF):
         self.set_text_color(15, 23, 42)
         self.cell(100, 5, f"Certificate ID: {cert_id}", align="L")
         
-        # 8. Signatures, Stamp & Barcode (Bottom-Right)
+        # 8. Signatures, Stamp, Barcode & QR Code (Bottom-Right)
         # Signature
-        sig_x = 135
+        sig_x = 115
         sig_y = 152
         self.set_xy(sig_x, sig_y)
         self.set_font("times", "BI", 13)
         self.set_text_color(11, 37, 64)
-        self.cell(50, 5, "Sai Charan", align="C", ln=True)
+        self.cell(45, 5, "Sai Charan", align="C", ln=True)
         
         # Signature Line
         self.set_draw_color(148, 163, 184)
         self.set_line_width(0.25)
-        self.line(135, sig_y + 5, 185, sig_y + 5)
+        self.line(115, sig_y + 5, 160, sig_y + 5)
         
         # Signature Title
         self.set_xy(sig_x, sig_y + 6)
         self.set_font("helvetica", "", 7.5)
         self.set_text_color(71, 85, 105)
-        self.cell(50, 4, "Sai Charan,", align="C", ln=True)
+        self.cell(45, 4, "Sai Charan,", align="C", ln=True)
         self.set_x(sig_x)
-        self.cell(50, 3, "CEO", align="C")
+        self.cell(45, 3, "CEO", align="C")
         
         # Blue Rubber Stamp
-        self.draw_rubber_stamp(cx=212, cy=157)
+        self.draw_rubber_stamp(cx=185, cy=157)
         
-        # Barcode (On the far right, replacing the gold seal)
-        barcode_x = 236
+        # Barcode
+        barcode_x = 205
         barcode_y = 152
-        self.draw_code39(barcode_x, barcode_y, cert_id, height=10, width_narrow=0.23)
+        self.draw_code39(barcode_x, barcode_y, cert_id, height=10, width_narrow=0.20)
+        
+        # QR Code for instant validation scan
+        qr_x = 248
+        qr_y = 149
+        qr_size = 16
+        qr_temp_path = "public/certificates/temp_qr.png"
+        
+        try:
+            # Construct verification URL
+            verify_url = f"https://apex-web-app-967134820705.us-central1.run.app/verify/{cert_id}"
+            
+            # Generate QR Code image
+            qr = qrcode.QRCode(version=1, box_size=10, border=1)
+            qr.add_data(verify_url)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Ensure folder exists and save
+            os.makedirs(os.path.dirname(qr_temp_path), exist_ok=True)
+            qr_img.save(qr_temp_path)
+            
+            # Place in PDF
+            self.image(qr_temp_path, qr_x, qr_y, qr_size, qr_size)
+        except Exception as e:
+            print(f"Warning: Failed to generate QR code: {e}")
+            # Fallback border placeholder if QR generation fails
+            self.set_draw_color(156, 163, 175)
+            self.set_line_width(0.2)
+            self.rect(qr_x, qr_y, qr_size, qr_size, 'D')
 
         # Output the PDF file
         self.output(output_path)
+        
+        # Clean up temp QR image
+        if os.path.exists(qr_temp_path):
+            try:
+                os.remove(qr_temp_path)
+            except:
+                pass
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Apex Tech Software Institute completion certificates based on classic image template.")
