@@ -60,8 +60,8 @@ def main():
     font_course = ImageFont.truetype(font_path_bold, 25.5)
     font_dates = ImageFont.truetype(font_path_bold, 20)
     
-    # Draw corrected course title: "ADVANCED PYTHON DEVELOPMENT"
-    draw_centered_text(draw, "ADVANCED PYTHON DEVELOPMENT", 416, font_course, fill=(15, 23, 42))
+    # Draw corrected course title: "ADVANCED PYTHON PROGRAMMING"
+    draw_centered_text(draw, "ADVANCED PYTHON PROGRAMMING", 416, font_course, fill=(15, 23, 42))
     
     # Draw corrected date range: "JAN 5TH, 2025 to JUNE 3RD, 2025."
     draw_centered_text(draw, "JAN 5TH, 2025 to JUNE 3RD, 2025.", 498, font_dates, fill=(15, 23, 42))
