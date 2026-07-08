@@ -1,4 +1,5 @@
 import os
+import argparse
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
 
@@ -10,22 +11,30 @@ def draw_centered_text(draw, text, y, font, fill=(15, 23, 42)):
     draw.text((x, y), text, font=font, fill=fill)
 
 def main():
-    # Use the backup media copy of the original WhatsApp JPEG image
-    original_image_path = "/home/sathish/.gemini/antigravity-cli/brain/945b84e0-8df5-4fc5-80da-5c062790cb61/.tempmediaStorage/media_945b84e0-8df5-4fc5-80da-5c062790cb61_1783515334723.jpg"
-    output_jpeg_path = "public/certificates/ATS-APD-24-1001.jpeg"
-    output_pdf_path = "public/certificates/ATS-APD-24-1001.pdf"
+    parser = argparse.ArgumentParser(description="Dynamically edit the classic certificate template with student details, photo, and verification QR code.")
+    parser.add_argument("-s", "--student", required=True, help="Name of the student")
+    parser.add_argument("-c", "--course", required=True, help="Course title")
+    parser.add_argument("-ds", "--date-start", required=True, help="Course start date description")
+    parser.add_argument("-de", "--date-end", required=True, help="Course end date description")
+    parser.add_argument("-i", "--id", required=True, help="Certificate ID")
+    parser.add_argument("-p", "--photo", default=None, help="Path to student face photo (optional)")
+    parser.add_argument("-o", "--output", required=True, help="Path to output PDF file")
+    parser.add_argument("-u", "--url-host", default="https://apex-web-app-967134820705.us-central1.run.app", help="Verification server URL host")
     
-    # Fonts
-    font_path_bold = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
+    args = parser.parse_args()
     
-    if not os.path.exists(original_image_path):
-        print(f"Error: Original certificate image not found at {original_image_path}")
+    template_path = "scripts/certificate_template.jpg"
+    if not os.path.exists(template_path):
+        template_path = os.path.join(os.path.dirname(__file__), "certificate_template.jpg")
+        
+    if not os.path.exists(template_path):
+        print(f"Error: Certificate template image not found at {template_path}")
         return
         
-    print(f"Loading original image: {original_image_path}")
-    cert_img = Image.open(original_image_path).convert("RGB")
+    print(f"Loading template: {template_path}")
+    cert_img = Image.open(template_path).convert("RGB")
     
-    # 1. Seamless texture patch covering of course title (no stamp here)
+    # 1. Seamless texture patch covering of old course title (no stamp here)
     left_patch_course = cert_img.crop((150, 100, 420, 140))
     right_patch_course = cert_img.crop((600, 100, 870, 140))
     cert_img.paste(left_patch_course, (242, 413))
@@ -44,7 +53,6 @@ def main():
     bg_patch.paste(left_bg, (0, 0))
     bg_patch.paste(right_bg, (270, 0))
     
-    print("Erasing old dates while preserving the blue stamp...")
     for y in range(y_start, y_end):
         for x in range(x_start, x_end):
             r, g, b = cert_img.getpixel((x, y))
@@ -55,20 +63,58 @@ def main():
                 bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
                 cert_img.putpixel((x, y), bg_pixel)
                 
-    # 3. Draw corrected text lines using true-type font
+    # 3. Erase the old Certificate ID and draw the new one
+    # Bounding box of ID: x = 200 to 450, y = 620 to 650
     draw = ImageDraw.Draw(cert_img)
+    font_path_bold = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
+    if not os.path.exists(font_path_bold):
+        font_path_bold = "DejaVuSans-Bold.ttf" # Fallback if run on other machines
+        
+    font_id = ImageFont.truetype(font_path_bold, 15)
+    
+    # Erase old ID
+    id_bg_patch = cert_img.crop((150, 100, 400, 130)) # width 250, height 30
+    cert_img.paste(id_bg_patch, (170, 622))
+    
+    # Draw new ID
+    id_text = f"Certificate ID: {args.id}"
+    draw.text((70, 625), id_text, font=font_id, fill=(15, 23, 42))
+
+    # 4. Erase the old student name and draw the new one
+    # Bounding box of name: x = 240 to 780, y = 330 to 380
+    name_bg_patch_left = cert_img.crop((150, 100, 420, 150)) # width 270, height 50
+    name_bg_patch_right = cert_img.crop((600, 100, 870, 150)) # width 270, height 50
+    cert_img.paste(name_bg_patch_left, (242, 335))
+    cert_img.paste(name_bg_patch_right, (512, 335))
+    
+    # For name, we use Times/Serif Italic-like style to match original template
+    font_path_serif_italic = "/usr/share/fonts/liberation/LiberationSerif-BoldItalic.ttf"
+    font_name = ImageFont.truetype(font_path_serif_italic, 32)
+    # Draw the student's name in UPPERCASE to match the template style
+    draw_centered_text(draw, args.student.upper(), 340, font_name, fill=(15, 23, 42))
+    
+    # 5. Draw corrected course and dates text lines using true-type font
     font_course = ImageFont.truetype(font_path_bold, 25.5)
     font_dates = ImageFont.truetype(font_path_bold, 20)
     
-    # Draw corrected course title: "ADVANCED PYTHON PROGRAMMING"
-    draw_centered_text(draw, "ADVANCED PYTHON PROGRAMMING", 416, font_course, fill=(15, 23, 42))
+    # Draw course title (uppercase)
+    draw_centered_text(draw, args.course.upper(), 416, font_course, fill=(15, 23, 42))
     
-    # Draw corrected date range: "JAN 5TH, 2025 to JUNE 3RD, 2025."
-    draw_centered_text(draw, "JAN 5TH, 2025 to JUNE 3RD, 2025.", 498, font_dates, fill=(15, 23, 42))
+    # Draw dates
+    dates_text = f"{args.date_start} to {args.date_end}."
+    draw_centered_text(draw, dates_text, 498, font_dates, fill=(15, 23, 42))
     
-    # 4. Generate and paste the verification QR Code on the right side
-    cert_id = "ATS/APD/24/1001"
-    verify_url = f"https://apex-web-app-967134820705.us-central1.run.app/verify/{cert_id}"
+    # 6. If custom student photo is provided, resize and paste it inside the photo box
+    if args.photo and os.path.exists(args.photo):
+        print(f"Loading student photo: {args.photo}")
+        photo_img = Image.open(args.photo).convert("RGB")
+        # Resize to fit the inner photo box (approx 120 width x 146 height)
+        photo_resized = photo_img.resize((120, 146), Image.Resampling.LANCZOS)
+        # Paste inside the black double border of the photo frame
+        cert_img.paste(photo_resized, (103, 290))
+        
+    # 7. Generate and paste the verification QR Code on the right side
+    verify_url = f"{args.url_host}/verify/{args.id}"
     print(f"Generating QR code for: {verify_url}")
     
     qr = qrcode.QRCode(
@@ -80,27 +126,22 @@ def main():
     qr.add_data(verify_url)
     qr.make(fit=True)
     
-    # Create QR image
     qr_img = qr.make_image(fill_color="black", back_color="white")
-    
-    # Resize QR code to fit the stamp/margins (90x90 pixels)
     qr_img_resized = qr_img.resize((90, 90), Image.Resampling.LANCZOS)
     
-    # Paste QR Code on the right of the stamp
     paste_x = 836
     paste_y = 535
-    print(f"Pasting QR code at coordinates: ({paste_x}, {paste_y})")
     cert_img.paste(qr_img_resized, (paste_x, paste_y))
     
-    # 5. Save the modified JPEG
-    os.makedirs(os.path.dirname(output_jpeg_path), exist_ok=True)
-    cert_img.save(output_jpeg_path, "JPEG", quality=95)
-    print(f"Modified JPEG saved to: {output_jpeg_path}")
-    
-    # 6. Convert the modified image directly to PDF to maintain 100% visual fidelity
-    cert_img.save(output_pdf_path, "PDF", resolution=100.0)
-    print(f"Final PDF compiled and saved to: {output_pdf_path}")
-    print("Verification certificate edit complete!")
+    # 8. Save the modified JPEG
+    # Save a copy as JPEG next to the PDF if needed, or save directly to PDF
+    output_dir = os.path.dirname(args.output)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        
+    # Compile directly to PDF to preserve high resolution vector wrapper
+    cert_img.save(args.output, "PDF", resolution=100.0)
+    print(f"Success: Certificate generated and saved to: {args.output}")
 
 if __name__ == "__main__":
     main()

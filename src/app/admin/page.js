@@ -1,4 +1,5 @@
 import { getLeads } from "../actions/contact";
+import { getCertificates } from "../actions/certificates";
 import courses from "../../data/courses.json";
 import AdminDashboard from "./AdminDashboard";
 
@@ -6,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const initialLeads = await getLeads();
+  const initialCertificates = await getCertificates();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -34,13 +36,13 @@ export default async function AdminPage() {
               <span className="text-xs bg-indigo-100 text-indigo-700 font-extrabold uppercase tracking-wider px-3 py-1 rounded-full border border-indigo-200">
                 Staff Control Center
               </span>
-              <h1 className="text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">Admissions CRM Dashboard</h1>
-              <p className="text-gray-500 text-sm mt-1">Review student requests, update callback statuses, and filter course interest metrics.</p>
+              <h1 className="text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">ApexTech Administration Center</h1>
+              <p className="text-gray-500 text-sm mt-1">Review student requests, callback status, and manage the Certificate Registry.</p>
             </div>
           </div>
 
           {/* Interactive Client Admin Dashboard */}
-          <AdminDashboard initialLeads={initialLeads} courses={courses} />
+          <AdminDashboard initialLeads={initialLeads} initialCertificates={initialCertificates} courses={courses} />
         </div>
       </main>
 

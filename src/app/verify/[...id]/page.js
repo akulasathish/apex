@@ -1,11 +1,20 @@
+import { db } from "../../../lib/gcp";
 import fs from "fs/promises";
 import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// Look up certificate by ID in the certificates store
+// Look up certificate by ID in Firestore first, then fallback to local JSON file
 async function getCertificate(id) {
   try {
+    // 1. Query Google Cloud Firestore
+    const fileId = id.replace(/\//g, "-");
+    const doc = await db.collection("certificates").doc(fileId).get();
+    if (doc.exists) {
+      return doc.data();
+    }
+
+    // 2. Fallback to local registry JSON
     const filePath = path.join(process.cwd(), "src/data/certificates.json");
     const fileContent = await fs.readFile(filePath, "utf8");
     const certificates = JSON.parse(fileContent);
@@ -49,9 +58,9 @@ export default async function VerifyPage({ params }) {
     );
   }
 
-  // Map the Certificate ID to its PDF filename (e.g. ATS/APD/24/1001 -> ATS-APD-24-1001.pdf)
+  const isActive = cert.status === "active";
   const pdfFilename = cert.id.replace(/\//g, "-") + ".pdf";
-  const downloadUrl = `/certificates/${pdfFilename}`;
+  const downloadUrl = cert.pdfUrl || `/certificates/${pdfFilename}`;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-zinc-300 font-sans px-6 relative py-12">
@@ -68,12 +77,31 @@ export default async function VerifyPage({ params }) {
 
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner">
-            <i className="fa-solid fa-circle-check"></i>
+          <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner ${
+            isActive 
+              ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400" 
+              : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
+          }`}>
+            <i className={isActive ? "fa-solid fa-circle-check" : "fa-solid fa-triangle-exclamation"}></i>
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">Credential Authenticated</h1>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+            {isActive ? "Credential Authenticated" : "Credential Revoked"}
+          </h1>
           <p className="text-xs text-[#00A3A6] font-bold uppercase tracking-widest">ApexTech Software Institute Registry</p>
         </div>
+
+        {/* Dynamic Student Graduation Photo */}
+        {isActive && cert.photoUrl && (
+          <div className="flex justify-center mt-6">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-zinc-800 p-1 bg-zinc-950 overflow-hidden shadow-xl">
+              <img
+                src={cert.photoUrl}
+                alt={cert.studentName}
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Certificate Metadata Table */}
         <div className="mt-8 space-y-4 border-t border-b border-zinc-800/80 py-6 text-sm">
@@ -106,8 +134,12 @@ export default async function VerifyPage({ params }) {
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
             <span className="text-zinc-500 font-medium">Verification Status</span>
-            <span className="inline-flex bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold px-3 py-1 rounded-full text-xs shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 self-center animate-pulse" />
+            <span className={`inline-flex font-bold px-3 py-1 rounded-full text-xs shadow-sm border ${
+              isActive 
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full mr-2 self-center ${isActive ? "bg-emerald-400 animate-pulse" : "bg-rose-400"}`} />
               {cert.status.toUpperCase()}
             </span>
           </div>
@@ -115,13 +147,20 @@ export default async function VerifyPage({ params }) {
 
         {/* Call to Action */}
         <div className="mt-8 space-y-4">
-          <a
-            href={downloadUrl}
-            download={pdfFilename}
-            className="w-full inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-2xl transition duration-150 shadow-lg shadow-blue-600/10 text-sm cursor-pointer"
-          >
-            <i className="fa-solid fa-download mr-2 text-base"></i>Download Certified PDF
-          </a>
+          {isActive ? (
+            <a
+              href={downloadUrl}
+              download={pdfFilename}
+              className="w-full inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-2xl transition duration-150 shadow-lg shadow-blue-600/10 text-sm cursor-pointer"
+            >
+              <i className="fa-solid fa-download mr-2 text-base"></i>Download Certified PDF
+            </a>
+          ) : (
+            <div className="w-full inline-flex justify-center items-center bg-zinc-800 text-zinc-500 font-bold py-3.5 px-4 rounded-2xl text-sm border border-zinc-700 cursor-not-allowed">
+              <i className="fa-solid fa-ban mr-2 text-base"></i>Download Unavailable (Revoked)
+            </div>
+          )}
+          
           <div className="text-center">
             <Link href="/" className="text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition">
               Back to Home
