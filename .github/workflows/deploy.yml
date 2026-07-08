@@ -3,7 +3,7 @@ name: Continuous Integration & Deployment (GCP Cloud Run)
 on:
   push:
     branches:
-      - version1  # Triggers the pipeline when pushing to the version1 branch
+      - main  # Triggers the pipeline when pushing to the main branch
 
 env:
   PROJECT_ID: apex-501001
