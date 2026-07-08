@@ -49,6 +49,10 @@ export default async function VerifyPage({ params }) {
     );
   }
 
+  // Map the Certificate ID to its PDF filename (e.g. ATS/APD/24/1001 -> ATS-APD-24-1001.pdf)
+  const pdfFilename = cert.id.replace(/\//g, "-") + ".pdf";
+  const downloadUrl = `/certificates/${pdfFilename}`;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#09090b] text-zinc-300 font-sans px-6 relative py-12">
       {/* Decorative background glows */}
@@ -112,8 +116,8 @@ export default async function VerifyPage({ params }) {
         {/* Call to Action */}
         <div className="mt-8 space-y-4">
           <a
-            href="/certificates/certificate_sample.pdf"
-            download="Apex_Tech_Certificate.pdf"
+            href={downloadUrl}
+            download={pdfFilename}
             className="w-full inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-2xl transition duration-150 shadow-lg shadow-blue-600/10 text-sm cursor-pointer"
           >
             <i className="fa-solid fa-download mr-2 text-base"></i>Download Certified PDF
