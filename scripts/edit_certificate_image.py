@@ -4,14 +4,14 @@ import qrcode
 from PIL import Image, ImageDraw, ImageFont
 
 def draw_centered_text(draw, text, y, font, fill=(15, 23, 42)):
-    # Calculate bounding box to center the text horizontally on a 1024px width image
+    # Center the text horizontally on the 1024px wide image canvas
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
     x = (1024 - text_width) / 2
     draw.text((x, y), text, font=font, fill=fill)
 
 def main():
-    parser = argparse.ArgumentParser(description="Dynamically edit the classic certificate template with student details, photo, and verification QR code.")
+    parser = argparse.ArgumentParser(description="Dynamically draw certificate details onto the sanitized template image.")
     parser.add_argument("-s", "--student", required=True, help="Name of the student")
     parser.add_argument("-c", "--course", required=True, help="Course title")
     parser.add_argument("-ds", "--date-start", required=True, help="Course start date description")
@@ -33,83 +33,44 @@ def main():
         
     print(f"Loading template: {template_path}")
     cert_img = Image.open(template_path).convert("RGB")
-    w, h = cert_img.size
     
-    # Keep the original circular logo and institute headers 100% untouched. No top erasure patches.
-    
-    # 1. Erase the old student name completely (X: 200 to 800, Y: 310 to 380)
-    # Using clean bottom-left patch X: 100-200, Y: 545-615 (height 70, width 100)
-    left_name_patch = cert_img.crop((100, 545, 200, 615))
-    for x_dest in [200, 300, 400, 500, 600, 700]:
-        cert_img.paste(left_name_patch, (x_dest, 310))
-    
-    # 2. Erase the old course title completely (X: 242 to 782, Y: 413 to 453)
-    # Using clean bottom-left patch height 40 (Y: 545-585)
-    clean_course_patch = cert_img.crop((100, 545, 200, 585))
-    for x_dest in [242, 342, 442, 542, 642, 742]:
-        cert_img.paste(clean_course_patch, (x_dest, 413))
-    
-    # 3. Smart pixel-level erase for the dates region (preserves blue stamp pixels)
-    x_start, y_start = 240, 492
-    x_end, y_end = 780, 530
-    pw = x_end - x_start
-    ph = y_end - y_start
-    
-    bg_patch = Image.new("RGB", (pw, ph))
-    left_bg = cert_img.crop((100, 545, 200, 545 + ph))
-    right_bg = cert_img.crop((200, 545, 300, 545 + ph))
-    bg_patch.paste(left_bg, (0, 0))
-    bg_patch.paste(right_bg, (100, 0))
-    bg_patch.paste(left_bg, (200, 0))
-    bg_patch.paste(right_bg, (300, 0))
-    bg_patch.paste(left_bg, (400, 0))
-    
-    for y in range(y_start, y_end):
-        for x in range(x_start, x_end):
-            r, g, b = cert_img.getpixel((x, y))
-            # Determine if it's the blue stamp ink (dominant blue channel)
-            is_blue = (b > r + 15) and (b > g + 10) and (b > 60)
-            if not is_blue:
-                bg_pixel = bg_patch.getpixel((x - x_start, y - y_start))
-                cert_img.putpixel((x, y), bg_pixel)
-                
-    # 4. Erase ONLY the old Certificate ID value (keep the Certificate ID: label on the template)
-    id_val_erase = cert_img.crop((100, 545, 300, 570)) # width 200, height 25
-    cert_img.paste(id_val_erase, (175, 622)) # Erase starting at 175, protecting ':' and space before
-    
-    # Draw new ID next to the label (starts at 180)
     draw = ImageDraw.Draw(cert_img)
+    
+    # Load fonts
     font_path_bold = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
     if not os.path.exists(font_path_bold):
         font_path_bold = "DejaVuSans-Bold.ttf" # Fallback if run on other machines
         
-    font_id = ImageFont.truetype(font_path_bold, 15)
-    draw.text((180, 625), args.id, font=font_id, fill=(15, 23, 42))
-
-    # 5. Draw the student's name in UPPERCASE to match the template style
     font_path_serif_italic = "/usr/share/fonts/liberation/LiberationSerif-BoldItalic.ttf"
+    if not os.path.exists(font_path_serif_italic):
+        font_path_serif_italic = "DejaVuSerif-BoldItalic.ttf"
+        
     font_name = ImageFont.truetype(font_path_serif_italic, 32)
-    draw_centered_text(draw, args.student.upper(), 340, font_name, fill=(15, 23, 42))
-    
-    # 6. Draw corrected course and dates text lines
     font_course = ImageFont.truetype(font_path_bold, 25.5)
     font_dates = ImageFont.truetype(font_path_bold, 20)
+    font_id = ImageFont.truetype(font_path_bold, 15)
     
-    # Draw course title (uppercase)
+    # 1. Draw the student's name in UPPERCASE (Serif Italic)
+    draw_centered_text(draw, args.student.upper(), 340, font_name, fill=(15, 23, 42))
+    
+    # 2. Draw course title in UPPERCASE (Sans-Serif Bold)
     draw_centered_text(draw, args.course.upper(), 416, font_course, fill=(15, 23, 42))
     
-    # Draw dates
+    # 3. Draw dates (Sans-Serif Bold)
     dates_text = f"{args.date_start.upper()} TO {args.date_end.upper()}."
     draw_centered_text(draw, dates_text, 498, font_dates, fill=(15, 23, 42))
     
-    # 7. If custom student photo is provided, resize and paste it inside the photo box
+    # 4. Draw Certificate ID next to the label (starts at 180)
+    draw.text((180, 625), args.id, font=font_id, fill=(15, 23, 42))
+    
+    # 5. If custom student photo is provided, resize and paste it inside the photo box
     if args.photo and os.path.exists(args.photo):
         print(f"Loading student photo: {args.photo}")
         photo_img = Image.open(args.photo).convert("RGB")
         photo_resized = photo_img.resize((120, 146), Image.Resampling.LANCZOS)
         cert_img.paste(photo_resized, (103, 290))
         
-    # 8. Generate and paste the verification QR Code on the right side
+    # 6. Generate and paste the verification QR Code on the right side
     verify_url = f"{args.url_host}/verify/{args.id}"
     print(f"Generating QR code for: {verify_url}")
     
@@ -126,7 +87,7 @@ def main():
     qr_img_resized = qr_img.resize((90, 90), Image.Resampling.LANCZOS)
     cert_img.paste(qr_img_resized, (836, 535))
     
-    # 9. Save the modified JPEG directly to PDF (classic look, full bleed, stable borders)
+    # 7. Save the modified image directly to PDF (keeps full-bleed classic style)
     output_dir = os.path.dirname(args.output)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
