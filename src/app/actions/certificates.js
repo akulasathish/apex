@@ -149,6 +149,41 @@ export async function revokeCertificate(id, newStatus) {
   }
 }
 
+export async function deleteCertificate(id) {
+  try {
+    const fileId = id.replace(/\//g, "-");
+    const docRef = db.collection("certificates").doc(fileId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
+      return { success: false, error: "Certificate not found." };
+    }
+    
+    const data = doc.data();
+    
+    // 1. Delete PDF from Google Cloud Storage
+    if (data.pdfUrl) {
+      const pdfPath = data.pdfUrl.split('/').slice(-2).join('/');
+      await bucket.file(pdfPath).delete().catch(err => console.warn(`Failed to delete PDF from storage: ${err.message}`));
+    }
+    
+    // 2. Delete Photo from Google Cloud Storage
+    if (data.photoUrl) {
+      const photoPath = data.photoUrl.split('/').slice(-2).join('/');
+      await bucket.file(photoPath).delete().catch(err => console.warn(`Failed to delete Photo from storage: ${err.message}`));
+    }
+    
+    // 3. Delete Document from Firestore
+    await docRef.delete();
+    
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting certificate:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 import { cookies } from "next/headers";
 
 export async function loginAdmin(email, password) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { issueCertificate, revokeCertificate } from "../actions/certificates";
+import { issueCertificate, revokeCertificate, deleteCertificate } from "../actions/certificates";
 
 export default function CertificateDashboard({ initialCertificates = [], courses = [] }) {
   const [certs, setCerts] = useState(initialCertificates);
@@ -101,6 +101,20 @@ export default function CertificateDashboard({ initialCertificates = [], courses
         );
       } else {
         alert(`Failed to update status: ${result.error}`);
+      }
+    });
+  };
+
+  const handleDelete = async (id) => {
+    const confirmMsg = "Are you sure you want to PERMANENTLY DELETE this certificate?\n\nThis will delete the database record, PDF file, and student photo. This action CANNOT be undone.";
+    if (!confirm(confirmMsg)) return;
+
+    startTransition(async () => {
+      const result = await deleteCertificate(id);
+      if (result.success) {
+        setCerts(prev => prev.filter(c => c.id !== id));
+      } else {
+        alert(`Failed to delete certificate: ${result.error}`);
       }
     });
   };
@@ -359,6 +373,15 @@ export default function CertificateDashboard({ initialCertificates = [], courses
                           <i className="fa-solid fa-ban"></i> Revoke
                         </>
                       )}
+                    </button>
+                    
+                    <button
+                      onClick={() => handleDelete(c.id)}
+                      disabled={isPending}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 p-2.5 rounded-xl font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                      title="Delete Certificate Permanently"
+                    >
+                      <i className="fa-solid fa-trash-can"></i> Delete
                     </button>
                   </div>
                 </div>
