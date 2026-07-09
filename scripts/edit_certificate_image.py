@@ -60,8 +60,8 @@ def main():
     dates_text = f"{args.date_start.upper()} TO {args.date_end.upper()}."
     draw_centered_text(draw, dates_text, 625, font_dates, fill=(15, 23, 42))
     
-    # 4. Draw Certificate ID next to the label (starts at X: 230, Y: 765)
-    draw.text((230, 765), args.id, font=font_id, fill=(15, 23, 42))
+    # 4. Draw Certificate ID next to the label (starts at X: 230, Y: 750)
+    draw.text((230, 750), args.id, font=font_id, fill=(15, 23, 42))
     
     # 5. If custom student photo is provided, resize and paste it inside the photo box (X: 118, Y: 342, W: 155, H: 176)
     if args.photo and os.path.exists(args.photo):
@@ -69,6 +69,8 @@ def main():
         photo_img = Image.open(args.photo).convert("RGB")
         photo_resized = photo_img.resize((155, 176), Image.Resampling.LANCZOS)
         cert_img.paste(photo_resized, (118, 342))
+        # Draw border frame around photo
+        draw.rectangle([117, 341, 274, 519], outline=(15, 23, 42), width=1)
         
     # 6. Generate and paste the verification QR Code on the right side (X: 1005, Y: 602, Size: 100x100)
     verify_url = f"{args.url_host}/verify/{args.id}"
