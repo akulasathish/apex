@@ -53,13 +53,13 @@ Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
               <img src="/logo.png" alt="ATSI Logo" className="h-12 w-auto object-contain" />
             </a>
           </div>
-          <nav className="flex space-x-6 md:space-x-8 font-medium">
+          <nav className="flex flex-wrap justify-center gap-x-6 md:gap-x-8 gap-y-2 font-medium">
             <a href="/" className="text-gray-600 hover:text-blue-600 transition">Home</a>
             <a href="/#courses" className="text-blue-600 hover:text-blue-700 font-semibold">Courses</a>
             <a href="/#about" className="text-gray-600 hover:text-blue-600 transition">Why Us</a>
             <a href="/#contact" className="text-gray-600 hover:text-blue-600 transition">Contact</a>
           </nav>
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="flex items-center space-x-4">
             <a href="tel:+918977696937" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition shadow-sm hover:shadow-blue-500/10 flex items-center gap-2">
               <i className="fa-solid fa-phone"></i>
               <span>Call Now</span>
