@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { submitEnquiry } from "../actions/contact";
 
 export default function ContactForm({ courses = [], defaultCourse = "" }) {
   const [formData, setFormData] = useState({
@@ -20,32 +21,25 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Helper to urlencode parameters for Netlify Forms
-  const encode = (data) => {
-    return Object.keys(data)
-      .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
-      .join("&");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResponse(null);
 
     try {
-      const res = await fetch("/__forms.html", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode({
-          "form-name": "contact",
-          ...formData,
-        }),
-      });
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("course", formData.course);
+      data.append("message", formData.message);
 
-      if (res.ok) {
+      const result = await submitEnquiry(null, data);
+
+      if (result.success) {
         setResponse({
           success: true,
-          message: "Thank you! Your enquiry has been received. Our team will contact you shortly.",
+          message: result.message,
         });
         // Reset form on success
         setFormData({
@@ -58,19 +52,20 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
       } else {
         setResponse({
           success: false,
-          error: "Could not submit enquiry. Please try again or call us directly.",
+          error: result.error || "Could not submit enquiry. Please try again.",
         });
       }
     } catch (err) {
-      console.error("Netlify form submission error:", err);
+      console.error("Form submission error:", err);
       setResponse({
         success: false,
-        error: "A network error occurred. Please check your internet connection.",
+        error: "A network error occurred. Please try again.",
       });
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl transition duration-300">
