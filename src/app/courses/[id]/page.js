@@ -101,6 +101,17 @@ Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
                 <span>Industry Certificate Provided</span>
               </div>
             </div>
+
+            {course.prices && (
+              <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                {course.prices.map((price, pIdx) => (
+                  <div key={pIdx} className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex flex-col justify-center min-w-[200px]">
+                    <span className="text-[10px] text-blue-300 font-bold uppercase tracking-wider">{price.label}</span>
+                    <span className="text-2xl font-black text-white mt-1">{price.amount}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

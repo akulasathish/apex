@@ -242,6 +242,17 @@ export default function Home() {
                 <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>Containerization (Docker & Kubernetes)</div>
                 <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>AWS Certified Cloud Practitioner & SysOps</div>
               </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS + Internship</span>
+                  <span className="text-2xl font-black text-orange-600 mt-1">₹4,999</span>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm border border-blue-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS & DevOps + Internship</span>
+                  <span className="text-2xl font-black text-blue-600 mt-1">₹7,999</span>
+                </div>
+              </div>
             </div>
             <div className="lg:w-1/4 text-center lg:text-right w-full sm:w-auto">
               <a href="/courses/aws-devops" className="inline-block w-full sm:w-auto bg-slate-900 text-white text-center font-bold px-8 py-4 rounded-xl hover:bg-slate-850 transition shadow-md hover:scale-[1.02] active:scale-[0.98]">
@@ -273,6 +284,17 @@ export default function Home() {
                   <p className="text-gray-600 text-sm mb-6 leading-relaxed">
                     {course.description}
                   </p>
+                  
+                  {course.prices && (
+                    <div className="mb-6 flex flex-wrap gap-2">
+                      {course.prices.map((price, pIdx) => (
+                        <div key={pIdx} className="bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl text-xs flex flex-col">
+                          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">{price.label}</span>
+                          <span className="text-sm font-black text-slate-850 mt-0.5">{price.amount}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="border-t border-gray-100 pt-5 mt-auto flex items-center justify-between">
                   <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1">

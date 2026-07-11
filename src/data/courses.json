@@ -8,6 +8,16 @@
     "description": "Become a cloud professional. Our comprehensive training program covers everything from core AWS cloud infrastructure to advanced DevOps automation pipelines.",
     "duration": "12 Weeks",
     "level": "Beginner to Advanced",
+    "prices": [
+      {
+        "label": "AWS + Internship",
+        "amount": "₹4,999"
+      },
+      {
+        "label": "AWS + DevOps + Internship",
+        "amount": "₹7,999"
+      }
+    ],
     "highlights": [
       "CI/CD Pipelines (Jenkins, GitHub Actions)",
       "Infrastructure as Code (Terraform)",

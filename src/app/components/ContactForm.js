@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { submitEnquiry } from "../actions/contact";
+import { trackLeadConversion } from "../../lib/gtag";
 
 export default function ContactForm({ courses = [], defaultCourse = "" }) {
   const [formData, setFormData] = useState({
@@ -37,6 +38,9 @@ export default function ContactForm({ courses = [], defaultCourse = "" }) {
       const result = await submitEnquiry(null, data);
 
       if (result.success) {
+        // Trigger Google Ads conversion tracking
+        trackLeadConversion();
+
         setResponse({
           success: true,
           message: result.message,
