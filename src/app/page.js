@@ -1,5 +1,6 @@
 import courses from "../data/courses.json";
 import ContactForm from "./components/ContactForm";
+import PromoPopup from "./components/PromoPopup";
 
 export default function Home() {
   const aiFeatures = [
@@ -551,6 +552,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <PromoPopup />
     </>
   );
 }
