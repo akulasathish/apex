@@ -68,24 +68,24 @@ export default function PromoPopup() {
 
         {/* Header Text */}
         <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-2">
-          AWS Training &amp; Internship
+          AWS &amp; DevOps with Guaranteed Internship
         </h3>
         
         <p className="text-gray-300 text-sm mb-5 leading-relaxed">
-          Launch your IT career with industry-focused cloud batch. Get 100% practical lab training + a certified internship.
+          Master AWS Cloud &amp; DevOps engineering with 100% practical lab training, plus a certified corporate internship opportunity included at no extra cost.
         </p>
 
         {/* Price Display */}
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 mb-5 flex items-center justify-between">
           <div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Special Promo Fee</span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Special Training Fee</span>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-3xl font-black text-orange-500">₹4,999</span>
-              <span className="text-xs text-gray-500 line-through">₹12,000</span>
+              <span className="text-3xl font-black text-orange-500">₹7,999</span>
+              <span className="text-xs text-gray-500 line-through">₹18,000</span>
             </div>
           </div>
           <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold">
-            Save 60%
+            Save 55%
           </span>
         </div>
 
@@ -93,7 +93,7 @@ export default function PromoPopup() {
         <ul className="space-y-3 mb-6 text-sm">
           <li className="flex items-center text-gray-200">
             <i className="fa-solid fa-circle-check text-orange-500 mr-2.5"></i>
-            <span>Real-World Internship Project</span>
+            <span>FREE Internship Project Included</span>
           </li>
           <li className="flex items-center text-gray-200">
             <i className="fa-solid fa-circle-check text-orange-500 mr-2.5"></i>

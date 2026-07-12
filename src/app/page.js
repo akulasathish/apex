@@ -246,11 +246,11 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS + Internship</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS Training with Guaranteed Internship</span>
                   <span className="text-2xl font-black text-orange-600 mt-1">₹4,999</span>
                 </div>
                 <div className="bg-white/80 backdrop-blur-sm border border-blue-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS & DevOps + Internship</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS & DevOps with Guaranteed Internship</span>
                   <span className="text-2xl font-black text-blue-600 mt-1">₹7,999</span>
                 </div>
               </div>

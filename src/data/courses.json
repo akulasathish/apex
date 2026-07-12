@@ -10,11 +10,11 @@
     "level": "Beginner to Advanced",
     "prices": [
       {
-        "label": "AWS + Internship",
+        "label": "AWS Training with Guaranteed Internship",
         "amount": "₹4,999"
       },
       {
-        "label": "AWS + DevOps + Internship",
+        "label": "AWS & DevOps with Guaranteed Internship",
         "amount": "₹7,999"
       }
     ],
@@ -115,6 +115,12 @@
           "Deployment - Hosting frontend on Vercel, server on Render/Heroku, and database on MongoDB Atlas"
         ]
       }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
+      }
     ]
   },
   {
@@ -168,6 +174,12 @@
           "Model Deployment - Building and deploying an ML app using Streamlit on Heroku/AWS Cloud",
           "Capstone Project - Building an end-to-end predictive analysis or GenAI model on real-world Kaggle datasets"
         ]
+      }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
       }
     ]
   },
@@ -223,6 +235,12 @@
           "Final Practical Project - Creating a multi-functional command line or GUI tool connected to a backend database"
         ]
       }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
+      }
     ]
   },
   {
@@ -276,6 +294,12 @@
           "Wireless Network Security - WPA2/WPA3 auditing, credential cracking, and rogue access points",
           "Defense & Incident Response - Firewall setups, IDS/IPS alerts, anti-malware policies, and secure system hardening"
         ]
+      }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
       }
     ]
   },
@@ -331,6 +355,12 @@
           "Continuous Integration (CI) - Integration of automated test suites into Jenkins pipeline runs"
         ]
       }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
+      }
     ]
   },
   {
@@ -384,6 +414,12 @@
           "Resume design boot camp: Structuring experience for SAP Consultant and Analyst positions",
           "Technical mock interviews, SAP Certification guidelines, and job reference listings"
         ]
+      }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
       }
     ]
   },
@@ -439,6 +475,12 @@
           "Graduation Project: Build and deploy an enterprise-grade AI chatbot on Google Cloud"
         ]
       }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
+      }
     ]
   },
   {
@@ -493,7 +535,12 @@
           "Final Capstone Project: Automated CI/CD pipeline that builds, tests, and deploys a fine-tuned model"
         ]
       }
+    ],
+    "prices": [
+      {
+        "label": "Training Fee (with Guaranteed Internship)",
+        "amount": "₹9,999"
+      }
     ]
   }
 ]
-
