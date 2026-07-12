@@ -68,25 +68,29 @@ export default function PromoPopup() {
 
         {/* Header Text */}
         <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-2">
-          AWS &amp; DevOps with Guaranteed Internship
+          AWS &amp; DevOps Cloud Training
         </h3>
         
         <p className="text-gray-300 text-sm mb-5 leading-relaxed">
-          Master AWS Cloud &amp; DevOps engineering with 100% practical lab training, plus a certified corporate internship opportunity included at no extra cost.
+          Launch your IT career with our flagship cloud programs. Get 100% practical lab training + a certified corporate internship opportunity included at no extra cost.
         </p>
 
-        {/* Price Display */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 mb-5 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Special Training Fee</span>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-3xl font-black text-orange-500">₹7,999</span>
+        {/* Price Displays */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col justify-center">
+            <span className="text-[10px] text-orange-400 uppercase tracking-wider font-bold">AWS + Internship</span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-black text-white">₹4,999</span>
+              <span className="text-xs text-gray-500 line-through">₹12,000</span>
+            </div>
+          </div>
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col justify-center">
+            <span className="text-[10px] text-blue-400 uppercase tracking-wider font-bold">AWS &amp; DevOps + Internship</span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-black text-white">₹7,999</span>
               <span className="text-xs text-gray-500 line-through">₹18,000</span>
             </div>
           </div>
-          <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold">
-            Save 55%
-          </span>
         </div>
 
         {/* Features List */}
