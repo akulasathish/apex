@@ -72,20 +72,20 @@ export default function PromoPopup() {
         </h3>
         
         <p className="text-gray-300 text-sm mb-5 leading-relaxed">
-          Launch your IT career with our flagship cloud programs. Get 100% practical lab training + a certified corporate internship opportunity included at no extra cost.
+          Launch your IT career with our flagship cloud programs. Get 100% practical lab training and gain production-level skills with industry-standard labs.
         </p>
 
         {/* Price Displays */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col justify-center">
-            <span className="text-[10px] text-orange-400 uppercase tracking-wider font-bold">AWS + Internship</span>
+            <span className="text-[10px] text-orange-400 uppercase tracking-wider font-bold">AWS Training</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-white">₹4,999</span>
               <span className="text-xs text-gray-500 line-through">₹12,000</span>
             </div>
           </div>
           <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col justify-center">
-            <span className="text-[10px] text-blue-400 uppercase tracking-wider font-bold">AWS &amp; DevOps + Internship</span>
+            <span className="text-[10px] text-blue-400 uppercase tracking-wider font-bold">AWS &amp; DevOps Program</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-white">₹7,999</span>
               <span className="text-xs text-gray-500 line-through">₹18,000</span>
@@ -97,7 +97,7 @@ export default function PromoPopup() {
         <ul className="space-y-3 mb-6 text-sm">
           <li className="flex items-center text-gray-200">
             <i className="fa-solid fa-circle-check text-orange-500 mr-2.5"></i>
-            <span>FREE Internship Project Included</span>
+            <span>Industry-Grade Capstone Projects</span>
           </li>
           <li className="flex items-center text-gray-200">
             <i className="fa-solid fa-circle-check text-orange-500 mr-2.5"></i>
