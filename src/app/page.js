@@ -244,14 +244,14 @@ export default function Home() {
                 <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>AWS Certified Cloud Practitioner & SysOps</div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS Training with Guaranteed Internship</span>
-                  <span className="text-2xl font-black text-orange-600 mt-1">₹4,999</span>
+              <div className="flex flex-col sm:flex-row gap-6 pt-6">
+                <div className="bg-white/90 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
+                  <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS Training with Guaranteed Internship</span>
+                  <span className="text-4xl font-black text-orange-600 mt-2">₹4,999</span>
                 </div>
-                <div className="bg-white/80 backdrop-blur-sm border border-blue-200 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AWS & DevOps with Guaranteed Internship</span>
-                  <span className="text-2xl font-black text-blue-600 mt-1">₹7,999</span>
+                <div className="bg-white/90 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
+                  <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS &amp; DevOps with Guaranteed Internship</span>
+                  <span className="text-4xl font-black text-blue-600 mt-2">₹7,999</span>
                 </div>
               </div>
             </div>
@@ -287,11 +287,11 @@ export default function Home() {
                   </p>
                   
                   {course.prices && (
-                    <div className="mb-6 flex flex-wrap gap-2">
+                    <div className="mb-6 flex flex-wrap gap-3">
                       {course.prices.map((price, pIdx) => (
-                        <div key={pIdx} className="bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl text-xs flex flex-col">
-                          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">{price.label}</span>
-                          <span className="text-sm font-black text-slate-850 mt-0.5">{price.amount}</span>
+                        <div key={pIdx} className="bg-slate-50 border border-slate-150 px-4 py-3 rounded-2xl text-xs flex flex-col w-full">
+                          <span className="text-[12px] text-gray-500 font-black uppercase tracking-wider">{price.label}</span>
+                          <span className="text-xl font-black text-slate-900 mt-1">{price.amount}</span>
                         </div>
                       ))}
                     </div>
