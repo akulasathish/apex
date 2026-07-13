@@ -8,6 +8,8 @@ export async function generateStaticParams() {
   }));
 }
 
+const HIDE_PRICES = true;
+
 export default async function CoursePage({ params }) {
   const { id } = await params;
   const course = courses.find((c) => c.id === id);
@@ -102,7 +104,7 @@ Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
               </div>
             </div>
 
-            {course.prices && (
+            {course.prices && !HIDE_PRICES && (
               <div className="pt-6 flex flex-col sm:flex-row gap-6">
                 {course.prices.map((price, pIdx) => (
                   <div key={pIdx} className="bg-white/10 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex flex-col justify-center min-w-[250px]">

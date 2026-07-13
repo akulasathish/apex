@@ -2,6 +2,8 @@ import courses from "../data/courses.json";
 import ContactForm from "./components/ContactForm";
 import PromoPopup from "./components/PromoPopup";
 
+const HIDE_PRICES = true;
+
 export default function Home() {
   const aiFeatures = [
     { text: "Google Cloud AI Ecosystem Focus", icon: "fa-solid fa-rocket", color: "text-red-400" },
@@ -244,16 +246,18 @@ export default function Home() {
                 <div className="flex items-center"><i className="fa-solid fa-circle-check text-green-500 mr-2.5 text-base"></i>AWS Certified Cloud Practitioner & SysOps</div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-6 pt-6">
-                <div className="bg-white/90 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
-                  <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS Cloud Training</span>
-                  <span className="text-4xl font-black text-orange-600 mt-2">₹4,999</span>
+              {!HIDE_PRICES && (
+                <div className="flex flex-col sm:flex-row gap-6 pt-6">
+                  <div className="bg-white/90 backdrop-blur-sm border border-orange-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
+                    <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS Cloud Training</span>
+                    <span className="text-4xl font-black text-orange-600 mt-2">₹4,999</span>
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
+                    <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS &amp; DevOps Program</span>
+                    <span className="text-4xl font-black text-blue-600 mt-2">₹7,999</span>
+                  </div>
                 </div>
-                <div className="bg-white/90 backdrop-blur-sm border border-blue-200 rounded-2xl p-6 flex flex-col justify-center shadow-md flex-1">
-                  <span className="text-sm font-black text-slate-600 uppercase tracking-wider">AWS &amp; DevOps Program</span>
-                  <span className="text-4xl font-black text-blue-600 mt-2">₹7,999</span>
-                </div>
-              </div>
+              )}
             </div>
             <div className="lg:w-1/4 text-center lg:text-right w-full sm:w-auto">
               <a href="/courses/aws-devops" className="inline-block w-full sm:w-auto bg-slate-900 text-white text-center font-bold px-8 py-4 rounded-xl hover:bg-slate-850 transition shadow-md hover:scale-[1.02] active:scale-[0.98]">
@@ -286,7 +290,7 @@ export default function Home() {
                     {course.description}
                   </p>
                   
-                  {course.prices && (
+                  {course.prices && !HIDE_PRICES && (
                     <div className="mb-6 flex flex-wrap gap-3">
                       {course.prices.map((price, pIdx) => (
                         <div key={pIdx} className="bg-slate-50 border border-slate-150 px-4 py-3 rounded-2xl text-xs flex flex-col w-full">

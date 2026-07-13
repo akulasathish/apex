@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 
+const HIDE_PRICES = true;
+
 export default function PromoPopup() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,7 +48,7 @@ export default function PromoPopup() {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || HIDE_PRICES) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-all duration-300">
