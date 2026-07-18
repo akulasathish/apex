@@ -7,9 +7,14 @@ import { notFound } from "next/navigation";
 // Look up certificate by ID in Vercel Postgres first, then fallback to local JSON file
 async function getCertificate(id) {
   try {
-    // 1. Query Vercel Postgres
+    // Normalize both ways to support IDs with slashes and dashes
+    const idWithSlashes = id.replace(/-/g, "/");
+    const idWithDashes = id.replace(/\//g, "-");
+
+    // 1. Query Vercel Postgres matching either format
     const { rows } = await sql`
-      SELECT * FROM certificates WHERE id = ${id}
+      SELECT * FROM certificates 
+      WHERE id = ${idWithSlashes} OR id = ${idWithDashes}
     `;
 
     if (rows && rows.length > 0) {
@@ -27,11 +32,16 @@ async function getCertificate(id) {
       };
     }
 
-    // 2. Fallback to local registry JSON
+    // 2. Fallback to local registry JSON matching either format
     const filePath = path.join(process.cwd(), "src/data/certificates.json");
     const fileContent = await fs.readFile(filePath, "utf8");
     const certificates = JSON.parse(fileContent);
-    return certificates.find((c) => c.id === id) || null;
+    
+    return certificates.find((c) => {
+      const targetNormal = c.id.replace(/\//g, "-").toLowerCase().trim();
+      const queryNormal = id.replace(/\//g, "-").toLowerCase().trim();
+      return targetNormal === queryNormal;
+    }) || null;
   } catch (e) {
     console.error("Error reading certificates:", e);
     return null;

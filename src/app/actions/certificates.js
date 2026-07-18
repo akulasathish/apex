@@ -232,23 +232,73 @@ export async function issueCertificate(formData) {
   }
 }
 
+function mapCertRow(cert) {
+  return {
+    ...cert,
+    studentName: cert.student_name,
+    courseTitle: cert.course_title,
+    dateStart: cert.date_start,
+    dateEnd: cert.date_end,
+    issueDate: cert.issue_date,
+    photoUrl: cert.photo_url,
+    pdfUrl: cert.pdf_url,
+    createdAt: cert.created_at
+  };
+}
+
 export async function getCertificates() {
   try {
+    // 1. Fetch from Postgres
     const { rows } = await sql`
       SELECT * FROM certificates ORDER BY created_at DESC
     `;
 
-    return rows.map(cert => ({
-      ...cert,
-      studentName: cert.student_name,
-      courseTitle: cert.course_title,
-      dateStart: cert.date_start,
-      dateEnd: cert.date_end,
-      issueDate: cert.issue_date,
-      photoUrl: cert.photo_url,
-      pdfUrl: cert.pdf_url,
-      createdAt: cert.created_at
-    }));
+    // 2. Read fallback JSON file
+    const filePath = path.join(process.cwd(), "src/data/certificates.json");
+    let fallbackCerts = [];
+    try {
+      const fileContent = await fs.readFile(filePath, "utf8");
+      fallbackCerts = JSON.parse(fileContent);
+    } catch (err) {
+      console.warn("Could not read fallback JSON:", err.message);
+    }
+
+    // 3. Find if any fallback certs are missing in the database
+    const dbIds = new Set(rows.map(r => r.id));
+    const missingCerts = fallbackCerts.filter(c => !dbIds.has(c.id));
+
+    if (missingCerts.length > 0) {
+      console.log(`Syncing ${missingCerts.length} missing certificates from JSON fallback to Postgres...`);
+      for (const cert of missingCerts) {
+        const photoUrl = cert.photoUrl || "";
+        const pdfUrl = cert.pdfUrl || "";
+        
+        await sql`
+          INSERT INTO certificates (id, student_name, course_title, date_start, date_end, issue_date, photo_url, pdf_url, status, created_at)
+          VALUES (
+            ${cert.id},
+            ${cert.studentName},
+            ${cert.courseTitle},
+            ${cert.dateStart},
+            ${cert.dateEnd},
+            ${cert.issueDate},
+            ${photoUrl},
+            ${pdfUrl},
+            ${cert.status || "active"},
+            ${new Date().toISOString()}
+          )
+          ON CONFLICT (id) DO NOTHING
+        `;
+      }
+      
+      // Re-fetch to return the updated database list
+      const { rows: updatedRows } = await sql`
+        SELECT * FROM certificates ORDER BY created_at DESC
+      `;
+      return updatedRows.map(mapCertRow);
+    }
+
+    return rows.map(mapCertRow);
   } catch (error) {
     console.error("Error retrieving certificates:", error);
     return [];
