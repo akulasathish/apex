@@ -175,7 +175,9 @@ export async function issueCertificate(formData) {
     
     const { url: photoUrl } = await put(photoPath, photoBuffer, {
       access: "public",
-      contentType: photoFile.type || "image/jpeg"
+      contentType: photoFile.type || "image/jpeg",
+      addRandomSuffix: false,
+      allowOverwrite: true
     });
 
     // 3. Compile PDF in memory using pure JS (pdf-lib)
@@ -194,7 +196,9 @@ export async function issueCertificate(formData) {
     const pdfPath = `certificates/${fileId}.pdf`;
     const { url: pdfUrl } = await put(pdfPath, pdfBuffer, {
       access: "public",
-      contentType: "application/pdf"
+      contentType: "application/pdf",
+      addRandomSuffix: false,
+      allowOverwrite: true
     });
 
     // 5. Save the certificate registry record to Vercel Postgres
