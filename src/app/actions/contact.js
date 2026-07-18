@@ -1,6 +1,6 @@
 "use server";
 
-import { supabase } from "../../lib/supabase";
+import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 
 export async function submitEnquiry(prevState, formData) {
@@ -22,23 +22,20 @@ export async function submitEnquiry(prevState, formData) {
     // Generate unique ID
     const leadId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
-    // Save directly to Supabase
-    const { error } = await supabase
-      .from("leads")
-      .insert([
-        {
-          id: leadId,
-          name,
-          email: email || "N/A",
-          phone,
-          course,
-          message: message || "No message provided.",
-          status: "unread", // unread, contacted, archived
-          created_at: new Date().toISOString(),
-        }
-      ]);
-
-    if (error) throw error;
+    // Save directly to Vercel Postgres
+    await sql`
+      INSERT INTO leads (id, name, email, phone, course, message, status, created_at)
+      VALUES (
+        ${leadId},
+        ${name},
+        ${email || "N/A"},
+        ${phone},
+        ${course},
+        ${message || "No message provided."},
+        'unread',
+        ${new Date().toISOString()}
+      )
+    `;
     
     revalidatePath("/admin");
 
@@ -47,7 +44,7 @@ export async function submitEnquiry(prevState, formData) {
       message: "Thank you! Your enquiry has been received. Our team will contact you shortly.",
     };
   } catch (error) {
-    console.error("Server error submitting enquiry to Supabase:", error);
+    console.error("Server error submitting enquiry to Vercel Postgres:", error);
     return {
       success: false,
       error: "Could not submit enquiry. Please try again or contact us directly.",
@@ -57,53 +54,47 @@ export async function submitEnquiry(prevState, formData) {
 
 export async function getLeads() {
   try {
-    const { data, error } = await supabase
-      .from("leads")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { rows } = await sql`
+      SELECT * FROM leads ORDER BY created_at DESC
+    `;
 
-    if (error) throw error;
-
-    return (data || []).map(lead => ({
+    return rows.map(lead => ({
       ...lead,
       createdAt: lead.created_at
     }));
   } catch (error) {
-    console.error("Error getting leads from Supabase:", error);
+    console.error("Error getting leads from Vercel Postgres:", error);
     return [];
   }
 }
 
 export async function updateLeadStatus(id, newStatus) {
   try {
-    const { error } = await supabase
-      .from("leads")
-      .update({ status: newStatus })
-      .eq("id", id);
-
-    if (error) throw error;
+    await sql`
+      UPDATE leads
+      SET status = ${newStatus}
+      WHERE id = ${id}
+    `;
 
     revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Error updating lead status in Supabase:", error);
+    console.error("Error updating lead status in Vercel Postgres:", error);
     return { success: false, error: error.message };
   }
 }
 
 export async function deleteLead(id) {
   try {
-    const { error } = await supabase
-      .from("leads")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+    await sql`
+      DELETE FROM leads
+      WHERE id = ${id}
+    `;
 
     revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Error deleting lead in Supabase:", error);
+    console.error("Error deleting lead in Vercel Postgres:", error);
     return { success: false, error: error.message };
   }
 }

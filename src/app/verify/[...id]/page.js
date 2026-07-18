@@ -1,22 +1,19 @@
-import { supabase } from "../../../lib/supabase";
+import { sql } from "@vercel/postgres";
 import fs from "fs/promises";
 import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// Look up certificate by ID in Supabase first, then fallback to local JSON file
+// Look up certificate by ID in Vercel Postgres first, then fallback to local JSON file
 async function getCertificate(id) {
   try {
-    // 1. Query Supabase
-    const { data: certs, error } = await supabase
-      .from("certificates")
-      .select("*")
-      .eq("id", id);
+    // 1. Query Vercel Postgres
+    const { rows } = await sql`
+      SELECT * FROM certificates WHERE id = ${id}
+    `;
 
-    if (error) throw error;
-
-    if (certs && certs.length > 0) {
-      const cert = certs[0];
+    if (rows && rows.length > 0) {
+      const cert = rows[0];
       return {
         ...cert,
         studentName: cert.student_name,

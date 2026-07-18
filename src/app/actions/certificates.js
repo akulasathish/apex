@@ -4,7 +4,8 @@ import fs from "fs/promises";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { supabase } from "../../lib/supabase";
+import { sql } from "@vercel/postgres";
+import { put, del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -29,13 +30,9 @@ export async function issueCertificate(formData) {
     }
 
     // 1. Calculate the next sequential Certificate ID number
-    const { count, error: countErr } = await supabase
-      .from("certificates")
-      .select("*", { count: "exact", head: true });
-
-    if (countErr) throw countErr;
-    
-    const serialNumber = 1001 + (count || 0); // Start from 1001
+    const { rows } = await sql`SELECT COUNT(*)::int as count FROM certificates`;
+    const count = rows[0]?.count || 0;
+    const serialNumber = 1001 + count; // Start from 1001
     
     // Construct course code (APP for Programming, ADO for DevOps/Cloud, APD for others)
     let courseCode = "APD";
@@ -49,23 +46,15 @@ export async function issueCertificate(formData) {
     const certId = `ATS/${courseCode}/${year}/${serialNumber}`;
     const fileId = certId.replace(/\//g, "-");
 
-    // 2. Upload student profile photo to Supabase Storage bucket
+    // 2. Upload student profile photo to Vercel Blob
     const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
     const photoExt = photoFile.name.split(".").pop() || "jpg";
     const photoPath = `photos/${fileId}.${photoExt}`;
     
-    const { error: photoUploadErr } = await supabase.storage
-      .from("certificates")
-      .upload(photoPath, photoBuffer, {
-        contentType: photoFile.type || "image/jpeg",
-        upsert: true
-      });
-
-    if (photoUploadErr) throw photoUploadErr;
-    
-    const { data: { publicUrl: photoUrl } } = supabase.storage
-      .from("certificates")
-      .getPublicUrl(photoPath);
+    const { url: photoUrl } = await put(photoPath, photoBuffer, {
+      access: "public",
+      contentType: photoFile.type || "image/jpeg"
+    });
 
     // 3. Write photo to a temporary local path so the Python script can read it
     const tempPhotoPath = `/tmp/${fileId}-photo.${photoExt}`;
@@ -84,48 +73,37 @@ export async function issueCertificate(formData) {
     console.log(`Executing PDF compiler command: ${cmd}`);
     await execAsync(cmd);
 
-    // 5. Read the generated PDF and upload it to Supabase Storage
+    // 5. Read the generated PDF and upload it to Vercel Blob
     const pdfBuffer = await fs.readFile(tempPdfPath);
     const pdfPath = `certificates/${fileId}.pdf`;
     
-    const { error: pdfUploadErr } = await supabase.storage
-      .from("certificates")
-      .upload(pdfPath, pdfBuffer, {
-        contentType: "application/pdf",
-        upsert: true
-      });
+    const { url: pdfUrl } = await put(pdfPath, pdfBuffer, {
+      access: "public",
+      contentType: "application/pdf"
+    });
 
-    if (pdfUploadErr) throw pdfUploadErr;
-    
-    const { data: { publicUrl: pdfUrl } } = supabase.storage
-      .from("certificates")
-      .getPublicUrl(pdfPath);
-
-    // 6. Save the certificate registry record to Supabase database
+    // 6. Save the certificate registry record to Vercel Postgres
     const issueDateString = new Date().toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric"
     });
     
-    const certRecord = {
-      id: certId,
-      student_name: studentName,
-      course_title: courseTitle,
-      date_start: dateStart,
-      date_end: dateEnd,
-      issue_date: issueDateString,
-      photo_url: photoUrl,
-      pdf_url: pdfUrl,
-      status: "active",
-      created_at: new Date().toISOString()
-    };
-    
-    const { error: dbErr } = await supabase
-      .from("certificates")
-      .insert([certRecord]);
-
-    if (dbErr) throw dbErr;
+    await sql`
+      INSERT INTO certificates (id, student_name, course_title, date_start, date_end, issue_date, photo_url, pdf_url, status, created_at)
+      VALUES (
+        ${certId},
+        ${studentName},
+        ${courseTitle},
+        ${dateStart},
+        ${dateEnd},
+        ${issueDateString},
+        ${photoUrl},
+        ${pdfUrl},
+        'active',
+        ${new Date().toISOString()}
+      )
+    `;
 
     // 7. Cleanup temporary local files
     await fs.unlink(tempPhotoPath).catch(() => {});
@@ -141,14 +119,11 @@ export async function issueCertificate(formData) {
 
 export async function getCertificates() {
   try {
-    const { data, error } = await supabase
-      .from("certificates")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { rows } = await sql`
+      SELECT * FROM certificates ORDER BY created_at DESC
+    `;
 
-    if (error) throw error;
-
-    return (data || []).map(cert => ({
+    return rows.map(cert => ({
       ...cert,
       studentName: cert.student_name,
       courseTitle: cert.course_title,
@@ -167,12 +142,11 @@ export async function getCertificates() {
 
 export async function revokeCertificate(id, newStatus) {
   try {
-    const { error } = await supabase
-      .from("certificates")
-      .update({ status: newStatus })
-      .eq("id", id);
-
-    if (error) throw error;
+    await sql`
+      UPDATE certificates
+      SET status = ${newStatus}
+      WHERE id = ${id}
+    `;
 
     revalidatePath("/admin");
     return { success: true };
@@ -184,37 +158,30 @@ export async function revokeCertificate(id, newStatus) {
 
 export async function deleteCertificate(id) {
   try {
-    const { data: certs, error: fetchErr } = await supabase
-      .from("certificates")
-      .select("*")
-      .eq("id", id);
-
-    if (fetchErr) throw fetchErr;
-    if (!certs || certs.length === 0) {
+    const { rows } = await sql`
+      SELECT * FROM certificates WHERE id = ${id}
+    `;
+    
+    if (rows.length === 0) {
       return { success: false, error: "Certificate not found." };
     }
 
-    const data = certs[0];
+    const data = rows[0];
     
-    // 1. Delete PDF from Supabase Storage
+    // 1. Delete PDF from Vercel Blob
     if (data.pdf_url) {
-      const pdfPath = data.pdf_url.split('/').slice(-2).join('/');
-      await supabase.storage.from("certificates").remove([pdfPath]).catch(err => console.warn(`Failed to delete PDF from storage: ${err.message}`));
+      await del(data.pdf_url).catch(err => console.warn(`Failed to delete PDF from Blob: ${err.message}`));
     }
     
-    // 2. Delete Photo from Supabase Storage
+    // 2. Delete Photo from Vercel Blob
     if (data.photo_url) {
-      const photoPath = data.photo_url.split('/').slice(-2).join('/');
-      await supabase.storage.from("certificates").remove([photoPath]).catch(err => console.warn(`Failed to delete Photo from storage: ${err.message}`));
+      await del(data.photo_url).catch(err => console.warn(`Failed to delete Photo from Blob: ${err.message}`));
     }
     
-    // 3. Delete Document from Supabase Database
-    const { error: deleteErr } = await supabase
-      .from("certificates")
-      .delete()
-      .eq("id", id);
-
-    if (deleteErr) throw deleteErr;
+    // 3. Delete Document from Vercel Postgres
+    await sql`
+      DELETE FROM certificates WHERE id = ${id}
+    `;
     
     revalidatePath("/admin");
     return { success: true };
@@ -228,35 +195,24 @@ export async function loginAdmin(email, password) {
   try {
     const docId = email.toLowerCase().trim();
     
-    // Fetch admin from Supabase
-    let { data: admin, error } = await supabase
-      .from("admins")
-      .select("*")
-      .eq("email", docId)
-      .maybeSingle();
-
-    if (error) throw error;
+    // Fetch admin from Vercel Postgres
+    const { rows } = await sql`
+      SELECT * FROM admins WHERE email = ${docId}
+    `;
+    let admin = rows[0];
 
     // Auto-seed if admins table has no records matching
     if (!admin) {
-      const { data: allAdmins, error: checkErr } = await supabase
-        .from("admins")
-        .select("email")
-        .limit(1);
+      const { rows: allAdmins } = await sql`
+        SELECT email FROM admins LIMIT 1
+      `;
       
-      if (checkErr) throw checkErr;
-      
-      if (!allAdmins || allAdmins.length === 0) {
+      if (allAdmins.length === 0) {
         // Table is empty, seed default
-        const { error: seedErr } = await supabase
-          .from("admins")
-          .insert([
-            {
-              email: "saicharan@apextechsoftware.com",
-              password: "8686113435@Akula"
-            }
-          ]);
-        if (seedErr) throw seedErr;
+        await sql`
+          INSERT INTO admins (email, password)
+          VALUES ('saicharan@apextechsoftware.com', '8686113435@Akula')
+        `;
 
         if (docId === "saicharan@apextechsoftware.com") {
           admin = {
