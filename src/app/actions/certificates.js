@@ -2,18 +2,140 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { exec } from "child_process";
-import { promisify } from "util";
 import { sql } from "@vercel/postgres";
 import { put, del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import QRCode from "qrcode";
 
-const execAsync = promisify(exec);
+// Native PDF Generator in JavaScript
+async function generateCertificatePdfBuffer({ studentName, courseTitle, dateStart, dateEnd, certId, photoBuffer, photoType }) {
+  // Create a new PDF document
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
 
-// Helper to sanitize dynamic string arguments for shell safety
-function sanitizeShellArg(str) {
-  return str.replace(/(["\\])/g, "\\$1");
+  // Load custom fonts
+  const fontPathBold = path.join(process.cwd(), "scripts/fonts/LiberationSans-Bold.ttf");
+  const fontPathSerifItalic = path.join(process.cwd(), "scripts/fonts/LiberationSerif-BoldItalic.ttf");
+
+  const fontBoldBytes = await fs.readFile(fontPathBold);
+  const fontSerifItalicBytes = await fs.readFile(fontPathSerifItalic);
+
+  const fontSansBold = await pdfDoc.embedFont(fontBoldBytes);
+  const fontSerifItalic = await pdfDoc.embedFont(fontSerifItalicBytes);
+
+  // Load the background template image
+  const templatePath = path.join(process.cwd(), "scripts/certificate_template.jpg");
+  const templateBytes = await fs.readFile(templatePath);
+  const templateImage = await pdfDoc.embedJpg(templateBytes);
+
+  // Add page of template size: 1232 x 864
+  const page = pdfDoc.addPage([1232, 864]);
+
+  // Draw background image
+  page.drawImage(templateImage, {
+    x: 0,
+    y: 0,
+    width: 1232,
+    height: 864,
+  });
+
+  const textColor = rgb(15/255, 23/255, 42/255);
+
+  // 1. Draw Student Name (centered) Y: 410, size: 36
+  const sName = studentName.toUpperCase();
+  const nameWidth = fontSerifItalic.widthOfTextAtSize(sName, 36);
+  const nameX = (1232 - nameWidth) / 2;
+  const nameY = 864 - 410 - 36;
+  page.drawText(sName, {
+    x: nameX,
+    y: nameY,
+    size: 36,
+    font: fontSerifItalic,
+    color: textColor,
+  });
+
+  // 2. Draw Course Title (centered) Y: 505, size: 28
+  const cTitle = courseTitle.toUpperCase();
+  const courseWidth = fontSansBold.widthOfTextAtSize(cTitle, 28);
+  const courseX = (1232 - courseWidth) / 2;
+  const courseY = 864 - 505 - 28;
+  page.drawText(cTitle, {
+    x: courseX,
+    y: courseY,
+    size: 28,
+    font: fontSansBold,
+    color: textColor,
+  });
+
+  // 3. Draw Dates (centered) Y: 625, size: 22
+  const datesText = `${dateStart.toUpperCase()} TO ${dateEnd.toUpperCase()}.`;
+  const datesWidth = fontSansBold.widthOfTextAtSize(datesText, 22);
+  const datesX = (1232 - datesWidth) / 2;
+  const datesY = 864 - 625 - 22;
+  page.drawText(datesText, {
+    x: datesX,
+    y: datesY,
+    size: 22,
+    font: fontSansBold,
+    color: textColor,
+  });
+
+  // 4. Draw Certificate ID Y: 750, size: 17
+  const idX = 230;
+  const idY = 864 - 750 - 17;
+  page.drawText(certId, {
+    x: idX,
+    y: idY,
+    size: 17,
+    font: fontSansBold,
+    color: textColor,
+  });
+
+  // 5. Draw Student Photo (if provided)
+  if (photoBuffer) {
+    let embeddedPhoto;
+    if (photoType && (photoType.includes("png") || photoType.includes("PNG"))) {
+      embeddedPhoto = await pdfDoc.embedPng(photoBuffer);
+    } else {
+      embeddedPhoto = await pdfDoc.embedJpg(photoBuffer);
+    }
+
+    // Coordinates: X: 118, Y: 342, W: 155, H: 176
+    page.drawImage(embeddedPhoto, {
+      x: 118,
+      y: 864 - 342 - 176,
+      width: 155,
+      height: 176,
+    });
+
+    // Draw border frame rectangle outline X: 117, Y: 341, W: 157, H: 178
+    page.drawRectangle({
+      x: 117,
+      y: 864 - 341 - 178,
+      width: 157,
+      height: 178,
+      borderColor: textColor,
+      borderWidth: 1,
+    });
+  }
+
+  // 6. Generate and Draw QR Code: X: 1005, Y: 602, size: 100x100
+  const verificationUrl = `https://apextechsoftwareinstitute.com/verify/${certId}`;
+  const qrBuffer = await QRCode.toBuffer(verificationUrl, { margin: 1, width: 100 });
+  const qrImage = await pdfDoc.embedPng(qrBuffer);
+  page.drawImage(qrImage, {
+    x: 1005,
+    y: 864 - 602 - 100,
+    width: 100,
+    height: 100,
+  });
+
+  // Serialize to PDF bytes
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
 }
 
 export async function issueCertificate(formData) {
@@ -56,33 +178,26 @@ export async function issueCertificate(formData) {
       contentType: photoFile.type || "image/jpeg"
     });
 
-    // 3. Write photo to a temporary local path so the Python script can read it
-    const tempPhotoPath = `/tmp/${fileId}-photo.${photoExt}`;
-    await fs.writeFile(tempPhotoPath, photoBuffer);
+    // 3. Compile PDF in memory using pure JS (pdf-lib)
+    console.log(`Compiling PDF for ${studentName} (${certId})...`);
+    const pdfBuffer = await generateCertificatePdfBuffer({
+      studentName,
+      courseTitle,
+      dateStart,
+      dateEnd,
+      certId,
+      photoBuffer,
+      photoType: photoFile.type
+    });
 
-    // 4. Run the Python script to draw the certificate PDF
-    const tempPdfPath = `/tmp/${fileId}.pdf`;
-    
-    const sName = sanitizeShellArg(studentName);
-    const cTitle = sanitizeShellArg(courseTitle);
-    const dStart = sanitizeShellArg(dateStart);
-    const dEnd = sanitizeShellArg(dateEnd);
-    
-    const cmd = `python3 scripts/edit_certificate_image.py -s "${sName}" -c "${cTitle}" -ds "${dStart}" -de "${dEnd}" -i "${certId}" -p "${tempPhotoPath}" -o "${tempPdfPath}"`;
-    
-    console.log(`Executing PDF compiler command: ${cmd}`);
-    await execAsync(cmd);
-
-    // 5. Read the generated PDF and upload it to Vercel Blob
-    const pdfBuffer = await fs.readFile(tempPdfPath);
+    // 4. Upload the compiled PDF to Vercel Blob
     const pdfPath = `certificates/${fileId}.pdf`;
-    
     const { url: pdfUrl } = await put(pdfPath, pdfBuffer, {
       access: "public",
       contentType: "application/pdf"
     });
 
-    // 6. Save the certificate registry record to Vercel Postgres
+    // 5. Save the certificate registry record to Vercel Postgres
     const issueDateString = new Date().toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -104,10 +219,6 @@ export async function issueCertificate(formData) {
         ${new Date().toISOString()}
       )
     `;
-
-    // 7. Cleanup temporary local files
-    await fs.unlink(tempPhotoPath).catch(() => {});
-    await fs.unlink(tempPdfPath).catch(() => {});
 
     revalidatePath("/admin");
     return { success: true, certId };
