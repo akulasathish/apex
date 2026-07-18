@@ -4,8 +4,9 @@ import fs from "fs/promises";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { db, bucket } from "../../lib/gcp";
+import { supabase } from "../../lib/supabase";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 const execAsync = promisify(exec);
 
@@ -28,11 +29,15 @@ export async function issueCertificate(formData) {
     }
 
     // 1. Calculate the next sequential Certificate ID number
-    const snapshot = await db.collection("certificates").count().get();
-    const count = snapshot.data().count;
-    const serialNumber = 1001 + count; // Start from 1001
+    const { count, error: countErr } = await supabase
+      .from("certificates")
+      .select("*", { count: "exact", head: true });
+
+    if (countErr) throw countErr;
     
-    // Construct course code (APP for Programming, APD for Development/others)
+    const serialNumber = 1001 + (count || 0); // Start from 1001
+    
+    // Construct course code (APP for Programming, ADO for DevOps/Cloud, APD for others)
     let courseCode = "APD";
     if (courseTitle.toLowerCase().includes("programming")) {
       courseCode = "APP";
@@ -44,18 +49,23 @@ export async function issueCertificate(formData) {
     const certId = `ATS/${courseCode}/${year}/${serialNumber}`;
     const fileId = certId.replace(/\//g, "-");
 
-    // 2. Upload student profile photo to Google Cloud Storage
+    // 2. Upload student profile photo to Supabase Storage bucket
     const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
     const photoExt = photoFile.name.split(".").pop() || "jpg";
     const photoPath = `photos/${fileId}.${photoExt}`;
     
-    const photoFileRef = bucket.file(photoPath);
-    await photoFileRef.save(photoBuffer, {
-      contentType: photoFile.type || "image/jpeg",
-      metadata: { cacheControl: "public, max-age=31536000" }
-    });
+    const { error: photoUploadErr } = await supabase.storage
+      .from("certificates")
+      .upload(photoPath, photoBuffer, {
+        contentType: photoFile.type || "image/jpeg",
+        upsert: true
+      });
+
+    if (photoUploadErr) throw photoUploadErr;
     
-    const photoUrl = `https://storage.googleapis.com/apex-certificates-501001/${photoPath}`;
+    const { data: { publicUrl: photoUrl } } = supabase.storage
+      .from("certificates")
+      .getPublicUrl(photoPath);
 
     // 3. Write photo to a temporary local path so the Python script can read it
     const tempPhotoPath = `/tmp/${fileId}-photo.${photoExt}`;
@@ -64,7 +74,6 @@ export async function issueCertificate(formData) {
     // 4. Run the Python script to draw the certificate PDF
     const tempPdfPath = `/tmp/${fileId}.pdf`;
     
-    // Format dynamic values safely for the shell command
     const sName = sanitizeShellArg(studentName);
     const cTitle = sanitizeShellArg(courseTitle);
     const dStart = sanitizeShellArg(dateStart);
@@ -75,19 +84,24 @@ export async function issueCertificate(formData) {
     console.log(`Executing PDF compiler command: ${cmd}`);
     await execAsync(cmd);
 
-    // 5. Read the generated PDF and upload it to Google Cloud Storage
+    // 5. Read the generated PDF and upload it to Supabase Storage
     const pdfBuffer = await fs.readFile(tempPdfPath);
     const pdfPath = `certificates/${fileId}.pdf`;
     
-    const pdfFileRef = bucket.file(pdfPath);
-    await pdfFileRef.save(pdfBuffer, {
-      contentType: "application/pdf",
-      metadata: { cacheControl: "public, max-age=31536000" }
-    });
-    
-    const pdfUrl = `https://storage.googleapis.com/apex-certificates-501001/${pdfPath}`;
+    const { error: pdfUploadErr } = await supabase.storage
+      .from("certificates")
+      .upload(pdfPath, pdfBuffer, {
+        contentType: "application/pdf",
+        upsert: true
+      });
 
-    // 6. Save the certificate registry record to Firestore database
+    if (pdfUploadErr) throw pdfUploadErr;
+    
+    const { data: { publicUrl: pdfUrl } } = supabase.storage
+      .from("certificates")
+      .getPublicUrl(pdfPath);
+
+    // 6. Save the certificate registry record to Supabase database
     const issueDateString = new Date().toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -96,18 +110,22 @@ export async function issueCertificate(formData) {
     
     const certRecord = {
       id: certId,
-      studentName,
-      courseTitle,
-      dateStart,
-      dateEnd,
-      issueDate: issueDateString,
-      photoUrl,
-      pdfUrl,
+      student_name: studentName,
+      course_title: courseTitle,
+      date_start: dateStart,
+      date_end: dateEnd,
+      issue_date: issueDateString,
+      photo_url: photoUrl,
+      pdf_url: pdfUrl,
       status: "active",
-      createdAt: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
     
-    await db.collection("certificates").doc(fileId).set(certRecord);
+    const { error: dbErr } = await supabase
+      .from("certificates")
+      .insert([certRecord]);
+
+    if (dbErr) throw dbErr;
 
     // 7. Cleanup temporary local files
     await fs.unlink(tempPhotoPath).catch(() => {});
@@ -123,12 +141,24 @@ export async function issueCertificate(formData) {
 
 export async function getCertificates() {
   try {
-    const snapshot = await db.collection("certificates").orderBy("createdAt", "desc").get();
-    const certs = [];
-    snapshot.forEach(doc => {
-      certs.push(doc.data());
-    });
-    return certs;
+    const { data, error } = await supabase
+      .from("certificates")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map(cert => ({
+      ...cert,
+      studentName: cert.student_name,
+      courseTitle: cert.course_title,
+      dateStart: cert.date_start,
+      dateEnd: cert.date_end,
+      issueDate: cert.issue_date,
+      photoUrl: cert.photo_url,
+      pdfUrl: cert.pdf_url,
+      createdAt: cert.created_at
+    }));
   } catch (error) {
     console.error("Error retrieving certificates:", error);
     return [];
@@ -137,10 +167,13 @@ export async function getCertificates() {
 
 export async function revokeCertificate(id, newStatus) {
   try {
-    const fileId = id.replace(/\//g, "-");
-    await db.collection("certificates").doc(fileId).update({
-      status: newStatus
-    });
+    const { error } = await supabase
+      .from("certificates")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    if (error) throw error;
+
     revalidatePath("/admin");
     return { success: true };
   } catch (error) {
@@ -151,30 +184,37 @@ export async function revokeCertificate(id, newStatus) {
 
 export async function deleteCertificate(id) {
   try {
-    const fileId = id.replace(/\//g, "-");
-    const docRef = db.collection("certificates").doc(fileId);
-    const doc = await docRef.get();
-    
-    if (!doc.exists) {
+    const { data: certs, error: fetchErr } = await supabase
+      .from("certificates")
+      .select("*")
+      .eq("id", id);
+
+    if (fetchErr) throw fetchErr;
+    if (!certs || certs.length === 0) {
       return { success: false, error: "Certificate not found." };
     }
+
+    const data = certs[0];
     
-    const data = doc.data();
-    
-    // 1. Delete PDF from Google Cloud Storage
-    if (data.pdfUrl) {
-      const pdfPath = data.pdfUrl.split('/').slice(-2).join('/');
-      await bucket.file(pdfPath).delete().catch(err => console.warn(`Failed to delete PDF from storage: ${err.message}`));
+    // 1. Delete PDF from Supabase Storage
+    if (data.pdf_url) {
+      const pdfPath = data.pdf_url.split('/').slice(-2).join('/');
+      await supabase.storage.from("certificates").remove([pdfPath]).catch(err => console.warn(`Failed to delete PDF from storage: ${err.message}`));
     }
     
-    // 2. Delete Photo from Google Cloud Storage
-    if (data.photoUrl) {
-      const photoPath = data.photoUrl.split('/').slice(-2).join('/');
-      await bucket.file(photoPath).delete().catch(err => console.warn(`Failed to delete Photo from storage: ${err.message}`));
+    // 2. Delete Photo from Supabase Storage
+    if (data.photo_url) {
+      const photoPath = data.photo_url.split('/').slice(-2).join('/');
+      await supabase.storage.from("certificates").remove([photoPath]).catch(err => console.warn(`Failed to delete Photo from storage: ${err.message}`));
     }
     
-    // 3. Delete Document from Firestore
-    await docRef.delete();
+    // 3. Delete Document from Supabase Database
+    const { error: deleteErr } = await supabase
+      .from("certificates")
+      .delete()
+      .eq("id", id);
+
+    if (deleteErr) throw deleteErr;
     
     revalidatePath("/admin");
     return { success: true };
@@ -184,30 +224,50 @@ export async function deleteCertificate(id) {
   }
 }
 
-import { cookies } from "next/headers";
-
 export async function loginAdmin(email, password) {
   try {
-    const adminsRef = db.collection("admins");
-    const snapshot = await adminsRef.get();
-    
-    // Auto-seed if database collection is empty
-    if (snapshot.empty) {
-      await adminsRef.doc("saicharan@apextechsoftware.com").set({
-        email: "saicharan@apextechsoftware.com",
-        password: "8686113435@Akula"
-      });
-    }
-
     const docId = email.toLowerCase().trim();
-    const doc = await adminsRef.doc(docId).get();
+    
+    // Fetch admin from Supabase
+    let { data: admin, error } = await supabase
+      .from("admins")
+      .select("*")
+      .eq("email", docId)
+      .maybeSingle();
 
-    if (!doc.exists) {
-      return { success: false, error: "Invalid email or password." };
+    if (error) throw error;
+
+    // Auto-seed if admins table has no records matching
+    if (!admin) {
+      const { data: allAdmins, error: checkErr } = await supabase
+        .from("admins")
+        .select("email")
+        .limit(1);
+      
+      if (checkErr) throw checkErr;
+      
+      if (!allAdmins || allAdmins.length === 0) {
+        // Table is empty, seed default
+        const { error: seedErr } = await supabase
+          .from("admins")
+          .insert([
+            {
+              email: "saicharan@apextechsoftware.com",
+              password: "8686113435@Akula"
+            }
+          ]);
+        if (seedErr) throw seedErr;
+
+        if (docId === "saicharan@apextechsoftware.com") {
+          admin = {
+            email: "saicharan@apextechsoftware.com",
+            password: "8686113435@Akula"
+          };
+        }
+      }
     }
 
-    const admin = doc.data();
-    if (admin.password !== password) {
+    if (!admin || admin.password !== password) {
       return { success: false, error: "Invalid email or password." };
     }
 

@@ -1,17 +1,33 @@
-import { db } from "../../../lib/gcp";
+import { supabase } from "../../../lib/supabase";
 import fs from "fs/promises";
 import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// Look up certificate by ID in Firestore first, then fallback to local JSON file
+// Look up certificate by ID in Supabase first, then fallback to local JSON file
 async function getCertificate(id) {
   try {
-    // 1. Query Google Cloud Firestore
-    const fileId = id.replace(/\//g, "-");
-    const doc = await db.collection("certificates").doc(fileId).get();
-    if (doc.exists) {
-      return doc.data();
+    // 1. Query Supabase
+    const { data: certs, error } = await supabase
+      .from("certificates")
+      .select("*")
+      .eq("id", id);
+
+    if (error) throw error;
+
+    if (certs && certs.length > 0) {
+      const cert = certs[0];
+      return {
+        ...cert,
+        studentName: cert.student_name,
+        courseTitle: cert.course_title,
+        dateStart: cert.date_start,
+        dateEnd: cert.date_end,
+        issueDate: cert.issue_date,
+        photoUrl: cert.photo_url,
+        pdfUrl: cert.pdf_url,
+        createdAt: cert.created_at
+      };
     }
 
     // 2. Fallback to local registry JSON
