@@ -253,49 +253,47 @@ export async function getCertificates() {
       SELECT * FROM certificates ORDER BY created_at DESC
     `;
 
-    // 2. Read fallback JSON file
-    const filePath = path.join(process.cwd(), "src/data/certificates.json");
-    let fallbackCerts = [];
-    try {
-      const fileContent = await fs.readFile(filePath, "utf8");
-      fallbackCerts = JSON.parse(fileContent);
-    } catch (err) {
-      console.warn("Could not read fallback JSON:", err.message);
-    }
-
-    // 3. Find if any fallback certs are missing in the database
-    const dbIds = new Set(rows.map(r => r.id));
-    const missingCerts = fallbackCerts.filter(c => !dbIds.has(c.id));
-
-    if (missingCerts.length > 0) {
-      console.log(`Syncing ${missingCerts.length} missing certificates from JSON fallback to Postgres...`);
-      for (const cert of missingCerts) {
-        const photoUrl = cert.photoUrl || "";
-        const pdfUrl = cert.pdfUrl || "";
-        
-        await sql`
-          INSERT INTO certificates (id, student_name, course_title, date_start, date_end, issue_date, photo_url, pdf_url, status, created_at)
-          VALUES (
-            ${cert.id},
-            ${cert.studentName},
-            ${cert.courseTitle},
-            ${cert.dateStart},
-            ${cert.dateEnd},
-            ${cert.issueDate},
-            ${photoUrl},
-            ${pdfUrl},
-            ${cert.status || "active"},
-            ${new Date().toISOString()}
-          )
-          ON CONFLICT (id) DO NOTHING
-        `;
+    // 2. If the database table is completely empty, seed it from the fallback JSON registry
+    if (rows.length === 0) {
+      const filePath = path.join(process.cwd(), "src/data/certificates.json");
+      let fallbackCerts = [];
+      try {
+        const fileContent = await fs.readFile(filePath, "utf8");
+        fallbackCerts = JSON.parse(fileContent);
+      } catch (err) {
+        console.warn("Could not read fallback JSON:", err.message);
       }
-      
-      // Re-fetch to return the updated database list
-      const { rows: updatedRows } = await sql`
-        SELECT * FROM certificates ORDER BY created_at DESC
-      `;
-      return updatedRows.map(mapCertRow);
+
+      if (fallbackCerts.length > 0) {
+        console.log(`Initial database seeding: copying ${fallbackCerts.length} certificates from JSON fallback to Vercel Postgres...`);
+        for (const cert of fallbackCerts) {
+          const photoUrl = cert.photoUrl || "";
+          const pdfUrl = cert.pdfUrl || "";
+          
+          await sql`
+            INSERT INTO certificates (id, student_name, course_title, date_start, date_end, issue_date, photo_url, pdf_url, status, created_at)
+            VALUES (
+              ${cert.id},
+              ${cert.studentName},
+              ${cert.courseTitle},
+              ${cert.dateStart},
+              ${cert.dateEnd},
+              ${cert.issueDate},
+              ${photoUrl},
+              ${pdfUrl},
+              ${cert.status || "active"},
+              ${new Date().toISOString()}
+            )
+            ON CONFLICT (id) DO NOTHING
+          `;
+        }
+        
+        // Re-fetch to return the seeded database list
+        const { rows: seededRows } = await sql`
+          SELECT * FROM certificates ORDER BY created_at DESC
+        `;
+        return seededRows.map(mapCertRow);
+      }
     }
 
     return rows.map(mapCertRow);
