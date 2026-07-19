@@ -321,6 +321,8 @@ export async function revokeCertificate(id, newStatus) {
   }
 }
 
+
+
 export async function deleteCertificate(id) {
   try {
     const { rows } = await sql`
@@ -347,6 +349,20 @@ export async function deleteCertificate(id) {
     await sql`
       DELETE FROM certificates WHERE id = ${id}
     `;
+
+    // 4. Delete from fallback JSON file if present
+    const filePath = path.join(process.cwd(), "src/data/certificates.json");
+    try {
+      const fileContent = await fs.readFile(filePath, "utf8");
+      const certificates = JSON.parse(fileContent);
+      const updatedCerts = certificates.filter(c => c.id !== id);
+      if (certificates.length !== updatedCerts.length) {
+        await fs.writeFile(filePath, JSON.stringify(updatedCerts, null, 2));
+        console.log(`Removed certificate ${id} from fallback JSON registry.`);
+      }
+    } catch (err) {
+      console.warn("Failed to update fallback JSON registry during delete:", err.message);
+    }
     
     revalidatePath("/admin");
     return { success: true };
