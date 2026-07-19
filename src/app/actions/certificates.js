@@ -325,32 +325,7 @@ export async function revokeCertificate(id, newStatus) {
 
 export async function deleteCertificate(id) {
   try {
-    const { rows } = await sql`
-      SELECT * FROM certificates WHERE id = ${id}
-    `;
-    
-    if (rows.length === 0) {
-      return { success: false, error: "Certificate not found." };
-    }
-
-    const data = rows[0];
-    
-    // 1. Delete PDF from Vercel Blob
-    if (data.pdf_url) {
-      await del(data.pdf_url).catch(err => console.warn(`Failed to delete PDF from Blob: ${err.message}`));
-    }
-    
-    // 2. Delete Photo from Vercel Blob
-    if (data.photo_url) {
-      await del(data.photo_url).catch(err => console.warn(`Failed to delete Photo from Blob: ${err.message}`));
-    }
-    
-    // 3. Delete Document from Vercel Postgres
-    await sql`
-      DELETE FROM certificates WHERE id = ${id}
-    `;
-
-    // 4. Delete from fallback JSON file if present
+    // 1. Always delete from fallback JSON file first if present
     const filePath = path.join(process.cwd(), "src/data/certificates.json");
     try {
       const fileContent = await fs.readFile(filePath, "utf8");
@@ -362,6 +337,30 @@ export async function deleteCertificate(id) {
       }
     } catch (err) {
       console.warn("Failed to update fallback JSON registry during delete:", err.message);
+    }
+
+    // 2. Query Vercel Postgres to see if it is in the database
+    const { rows } = await sql`
+      SELECT * FROM certificates WHERE id = ${id}
+    `;
+    
+    if (rows.length > 0) {
+      const data = rows[0];
+      
+      // 3. Delete PDF from Vercel Blob if it's a Vercel Blob URL
+      if (data.pdf_url && data.pdf_url.startsWith("http")) {
+        await del(data.pdf_url).catch(err => console.warn(`Failed to delete PDF from Blob: ${err.message}`));
+      }
+      
+      // 4. Delete Photo from Vercel Blob if it's a Vercel Blob URL
+      if (data.photo_url && data.photo_url.startsWith("http")) {
+        await del(data.photo_url).catch(err => console.warn(`Failed to delete Photo from Blob: ${err.message}`));
+      }
+      
+      // 5. Delete Document from Vercel Postgres
+      await sql`
+        DELETE FROM certificates WHERE id = ${id}
+      `;
     }
     
     revalidatePath("/admin");
