@@ -225,7 +225,7 @@ export async function issueCertificate(formData) {
     `;
 
     revalidatePath("/admin");
-    return { success: true, certId };
+    return { success: true, certId, pdfUrl, photoUrl };
   } catch (error) {
     console.error("Error issuing certificate:", error);
     return { success: false, error: error.message };

@@ -73,8 +73,8 @@ export default function CertificateDashboard({ initialCertificates = [], courses
           dateStart,
           dateEnd,
           issueDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-          photoUrl: photoPreview, // Use temporary preview URL local
-          pdfUrl: `https://storage.googleapis.com/apex-certificates-501001/certificates/${result.certId.replace(/\//g, "-")}.pdf`,
+          photoUrl: result.photoUrl || photoPreview,
+          pdfUrl: result.pdfUrl,
           status: "active",
           createdAt: new Date().toISOString()
         };
