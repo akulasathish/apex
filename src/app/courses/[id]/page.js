@@ -52,7 +52,7 @@ Phone: +91 8977696937 | Email: hr@apextechsoftwareinstitute.com
         <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="apex-logo-container">
             <a href="/" className="flex items-center">
-              <img src="/logo.png" alt="ATSI Logo" className="h-12 w-auto object-contain" />
+              <img src="/logo.png" alt="ATSI Logo" className="h-[67px] w-auto object-contain" />
             </a>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-6 md:gap-x-8 gap-y-2 font-medium">

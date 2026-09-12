@@ -44,7 +44,7 @@ export default function AdminLogin() {
 
         {/* Brand Header */}
         <div className="text-center space-y-2 mb-8">
-          <img src="/logo.png" alt="Logo" className="h-14 w-auto mx-auto object-contain mb-4" />
+          <img src="/logo.png" alt="Logo" className="h-[78px] w-auto mx-auto object-contain mb-4" />
           <h1 className="text-xl font-extrabold text-white tracking-tight">Staff Authentication</h1>
           <p className="text-xs text-[#00A3A6] font-bold uppercase tracking-widest">ApexTech Administration Portal</p>
         </div>
